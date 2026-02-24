@@ -41,11 +41,11 @@ export function Header() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" className="text-foreground hover:bg-muted rounded-full px-5">
-              Login
+            <Button variant="ghost" className="text-foreground hover:bg-muted rounded-full px-5" asChild>
+              <Link href="/login">Ingresar</Link>
             </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-5">
-              Registrarse
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-5" asChild>
+              <Link href="/register">Registrarse</Link>
             </Button>
           </div>
 
@@ -99,11 +99,11 @@ export function Header() {
                 Contacto
               </Link>
               <div className="flex flex-col gap-3 mt-4">
-                <Button variant="outline" className="rounded-full w-full">
-                  Login
+                <Button variant="outline" className="rounded-full w-full" asChild>
+                  <Link href="/login">Ingresar</Link>
                 </Button>
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full w-full">
-                  Registrarse
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full w-full" asChild>
+                  <Link href="/register">Registrarse</Link>
                 </Button>
               </div>
             </div>
