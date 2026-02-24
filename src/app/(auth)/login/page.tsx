@@ -3,10 +3,18 @@
 import { LoginForm } from "@/components/auth"
 import type { LoginData } from "@/components/auth"
 
+import { useAuth } from '@/src/features/auth/hooks/useAuth'
+
 export default function LoginPage() {
+  const { login, isLoading, error } = useAuth()
+
   async function handleLogin(data: LoginData) {
-    // Ready to connect to your API
-    console.log("Login:", data)
+    try {
+      await login(data)
+    } catch (err) {
+      // El error ya está en el estado, el componente puede mostrarlo
+      console.error('Login error:', err)
+    }
   }
 
   return (
@@ -19,7 +27,14 @@ export default function LoginPage() {
           Inicia sesion para acceder a tu plan nutricional.
         </p>
       </div>
-      <LoginForm onLogin={handleLogin} />
+      
+      {error && (
+        <div className="p-4 bg-destructive/10 text-destructive rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+      
+      <LoginForm onLogin={handleLogin}/>
     </div>
   )
 }

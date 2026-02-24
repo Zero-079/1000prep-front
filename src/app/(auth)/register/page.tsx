@@ -2,10 +2,24 @@
 
 import { RegisterForm } from "@/components/auth"
 import type { RegisterData } from "@/components/auth"
+import { useAuth } from '@/src/features/auth/hooks/useAuth'
 
 export default function RegisterPage() {
+  const { register, isLoading, error } = useAuth()
+
   async function handleRegister(data: RegisterData) {
     // Ready to connect to your API
+      try {
+      // Mapear datos del formulario al payload del backend
+      await register({
+        email: data.email,
+        password: data.password,
+        name: 'aaa', // El formulario actual NO tiene nombre, necesitarás agregarlo
+        phone: '111', // El formulario actual NO tiene teléfono, necesitarás agregarlo
+      })
+    } catch (err) {
+      console.error('Register error:', err)
+    }
     console.log("Register:", data)
   }
 
@@ -19,7 +33,16 @@ export default function RegisterPage() {
           Empieza tu camino hacia una alimentacion saludable y precisa.
         </p>
       </div>
-      <RegisterForm onRegister={handleRegister} />
+      
+      {error && (
+        <div className="p-4 bg-destructive/10 text-destructive rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+      
+      <RegisterForm onRegister={handleRegister}/>
     </div>
   )
 }
+    
+
