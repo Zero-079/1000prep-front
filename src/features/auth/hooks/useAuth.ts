@@ -3,10 +3,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthContext } from '../context/AuthContext';
 import { authService, type LoginPayload, type RegisterPayload } from '../services/auth.service';
+import { ca } from 'date-fns/locale';
 
 export function useAuth() {
   const router = useRouter();
+  const {setIsAuthenticated, setUser, isAuthenticated, user} = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,6 +19,8 @@ export function useAuth() {
     setError(null);
     try {
       const response = await authService.login(data);
+      setIsAuthenticated(true);
+      setUser(response.user);
       router.push('/');
     } catch (err: any) {
       const message = err.data?.message || err.message || 'Error al iniciar sesión';
@@ -42,10 +47,18 @@ export function useAuth() {
     }
   };
 
-  const logout = () => {
-    authService.logout();
-    setError(null);
-    router.push('/login');
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      await authService.logout();
+      setIsAuthenticated(false);
+      setUser(null);
+      router.push('/login');
+    }catch (err: any) {
+      setError(err.message || 'Error al cerrar sesión');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
@@ -54,5 +67,7 @@ export function useAuth() {
     logout,
     isLoading,
     error,
+    isAuthenticated,
+    user,
   };
 }
