@@ -3,7 +3,7 @@
 import { LoginForm } from "@/components/auth"
 import type { LoginData } from "@/components/auth"
 
-import { useAuth } from '@/src/features/auth/hooks/useAuth'
+import { useAuth } from '../../../features/auth/hooks/useAuth'
 
 export default function LoginPage() {
   const { login, isLoading, error } = useAuth()

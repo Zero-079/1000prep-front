@@ -11,25 +11,15 @@ export async function fetchAPI<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
-  // Obtener token del localStorage o sessionStorage
-  let token: string | null = null;
-  if (typeof window !== 'undefined') {
-    token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-  }
-  
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
-  
-  // Adjuntar JWT si existe
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
+    
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include',
   });
   
   // Manejo de errores HTTP

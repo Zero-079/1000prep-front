@@ -34,11 +34,9 @@ export const authService = {
   },
 
   async login(data: LoginPayload): Promise<AuthResponse> {
-    // No enviar rememberMe al backend, solo usarlo en el cliente
-    const { rememberMe, ...payload } = data;
     return fetchAPI<AuthResponse>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   },
 

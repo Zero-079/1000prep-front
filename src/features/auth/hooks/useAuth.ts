@@ -11,18 +11,12 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   const login = async (data: LoginPayload) => {
+    console.log('rememberMe recibido en hook:', data.rememberMe)
     setIsLoading(true);
     setError(null);
     try {
       const response = await authService.login(data);
-      
-      // Determinar dónde guardar el token
-      const storage = data.rememberMe ? localStorage : sessionStorage;
-      storage.setItem('authToken', response.token);
-      storage.setItem('authUser', JSON.stringify(response.user));
-      
-      // Redirigir al dashboard
-      router.push('/dashboard');
+      router.push('/');
     } catch (err: any) {
       const message = err.data?.message || err.message || 'Error al iniciar sesión';
       setError(message);
