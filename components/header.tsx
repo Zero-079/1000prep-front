@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Menu, X, User, Settings, ShoppingCart, Package, LogOut, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useAuth } from "@/src/features/auth/hooks/useAuth"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,16 +16,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+
 export interface HeaderUser {
   name: string
   email: string
   avatarUrl?: string
 }
 
-interface HeaderProps {
-  user?: HeaderUser | null
-  onLogout?: () => void
-}
 
 function getInitials(name: string) {
   return name
@@ -43,8 +41,9 @@ const navLinks = [
   { href: "#contacto", label: "Contacto" },
 ]
 
-export function Header({ user = null, onLogout }: HeaderProps) {
+export function Header(){
   const [isOpen, setIsOpen] = useState(false)
+  const { user, isAuthenticated, logout } = useAuth()
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6">
@@ -73,8 +72,9 @@ export function Header({ user = null, onLogout }: HeaderProps) {
 
           {/* Desktop Right Side */}
           <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <AccountMenu user={user} onLogout={onLogout} />
+            {isAuthenticated && user ? (
+              <AccountMenu user={{ name: user.name, email: user.email }}
+              onLogout={logout} />
             ) : (
               <>
                 <Button variant="ghost" className="text-foreground hover:bg-muted rounded-full px-5" asChild>
@@ -89,8 +89,8 @@ export function Header({ user = null, onLogout }: HeaderProps) {
 
           {/* Mobile Right Side */}
           <div className="flex md:hidden items-center gap-2">
-            {user && (
-              <AccountMenu user={user} onLogout={onLogout} mobile />
+            {isAuthenticated && user && (
+              <AccountMenu user={{ name: user.name, email: user.email }} onLogout={logout} mobile />
             )}
             <button
               className="p-2"
@@ -117,7 +117,7 @@ export function Header({ user = null, onLogout }: HeaderProps) {
                 </Link>
               ))}
 
-              {user ? (
+              {isAuthenticated && user ? (
                 <div className="flex flex-col gap-1 mt-4 pt-4 border-t border-border/50">
                   <div className="flex items-center gap-3 px-1 mb-3">
                     <Avatar className="size-9">
@@ -152,7 +152,7 @@ export function Header({ user = null, onLogout }: HeaderProps) {
                   <button
                     onClick={() => {
                       setIsOpen(false)
-                      onLogout?.()
+                      logout()
                     }}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors text-sm"
                   >

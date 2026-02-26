@@ -10,6 +10,7 @@ interface User {
   email: string;
   name: string;
   role: string;
+  avatarUrl?: string;
 }
 
 interface AuthContextType {
@@ -32,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`,
           {
             method: 'GET',
             credentials: 'include', // Enviar cookies
