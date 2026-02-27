@@ -14,11 +14,11 @@ import {
 import { Header } from "@/components/header"
 import type { HeaderUser } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { CartProvider } from "@/components/comidas/cart-context"
-import { MealsHero } from "@/components/comidas/meals-hero"
-import { MealsGrid } from "@/components/comidas/meals-grid"
-import { MealDetailModal } from "@/components/comidas/meal-detail-modal"
-import { MiniCart } from "@/components/comidas/mini-cart"
+import { CartProvider } from "@/components/1000prep/cart-context"
+import { MealsHero } from "@/components/1000prep/meals-hero"
+import { MealsGrid } from "@/components/1000prep/meals-grid"
+import { MealDetailModal } from "@/components/1000prep/meal-detail-modal"
+import { MiniCart } from "@/components/1000prep/mini-cart"
 import { meals, filterOptions, type FilterOption, type Meal } from "../../../lib/meals-data"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -38,8 +38,8 @@ import { cn } from "@/lib/utils"
 
 
 
-export default function ComidasPage() {
-  const [user, setUser] = useState<HeaderUser | null>(demoUser)
+export default function MilprepPage() {
+  const [user, setUser] = useState<HeaderUser | null>(null)
   const [activeFilter, setActiveFilter] = useState<FilterOption>("Todos")
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -60,7 +60,7 @@ export default function ComidasPage() {
   return (
     <CartProvider>
       <div className="min-h-screen bg-muted/40">
-        <Header user={user} onLogout={() => setUser(null)} />
+        <Header  />
 
         <MealsHero />
 

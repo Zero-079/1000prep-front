@@ -1,7 +1,7 @@
 "use client"
 
 import type { Meal } from "@/lib/meals-data"
-import { MealCard } from "@/components/comidas/meal-card"
+import { MealCard } from "@/components/1000prep/meal-card"
 
 interface MealsGridProps {
   meals: Meal[]

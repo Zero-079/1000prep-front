@@ -5,7 +5,7 @@ import { Plus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { Meal } from "@/lib/meals-data"
-import { useCart } from "@/components/comidas/cart-context"
+import { useCart } from "@/components/1000prep/cart-context"
 
 interface MealCardProps {
   meal: Meal

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import type { Meal } from "@/lib/meals-data"
-import { useCart } from "@/components/comidas/cart-context"
+import { useCart } from "@/components/1000prep/cart-context"
 
 interface MealDetailModalProps {
   meal: Meal | null

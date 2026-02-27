@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { ShoppingCart, X, Minus, Plus, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useCart } from "@/components/comidas/cart-context"
+import { useCart } from "@/components/1000prep/cart-context"
 import { cn } from "@/lib/utils"
 
 export function MiniCart() {

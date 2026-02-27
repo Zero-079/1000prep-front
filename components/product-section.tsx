@@ -54,7 +54,7 @@ export function ProductSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="comidas" className="py-24 lg:py-32 bg-muted/30">
+    <section ref={sectionRef} id="1000prep" className="py-24 lg:py-32 bg-muted/30">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16 lg:mb-20">
