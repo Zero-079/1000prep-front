@@ -34,11 +34,10 @@ function getInitials(name: string) {
 }
 
 const navLinks = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#comidas", label: "Comidas" },
-  { href: "#suplementos", label: "Suplementos" },
-  { href: "#nutricionista", label: "Nutricionista" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/", label: "Inicio" },
+  { href: "/1000prep", label: "1000Prep" },
+  { href: "/#suplementos", label: "Suplementos" },
+  { href: "/#nutricionista", label: "Nutricionista" },
 ]
 
 export function Header(){
