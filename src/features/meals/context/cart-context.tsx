@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
-import type { Meal, CartItem } from "@/lib/meals-data"
+import type { Meal, CartItem } from "../../../lib/meals-data"
 
 interface CartContextType {
   items: CartItem[]

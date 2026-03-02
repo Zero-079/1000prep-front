@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Button } from "@/src/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
 export function MissionSection() {

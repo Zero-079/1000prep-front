@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Menu, X, User, Settings, ShoppingCart, Package, LogOut, ChevronDown } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import { useAuth } from "@/src/features/auth/hooks/useAuth"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useAuth } from "@/features/auth/hooks/useAuth"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 
 
 export interface HeaderUser {

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { mealsService } from '../services/meals.service'
-import type { Meal } from '@/lib/types/meal'
+import type { Meal } from '../../../lib/types/meal'
 
 export function useMeals(date?: string, mealType?: string) {
   const [meals, setMeals] = useState<Meal[] | null>(null)

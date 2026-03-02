@@ -2,10 +2,10 @@
 
 import Image from "next/image"
 import { Plus } from "lucide-react"
-import { Badge } from "@/src/components/ui/badge"
-import { Button } from "@/src/components/ui/button"
-import type { Meal } from "@/src/lib/meals-data"
-import { useCart } from "@/components/1000prep/cart-context"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import type { Meal } from "../../../lib/meals-data"
+import { useCart } from "@/features/meals/context/cart-context"
 
 interface MealCardProps {
   meal: Meal

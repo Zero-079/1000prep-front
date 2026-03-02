@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { CalendarCheck, Percent, Info, X } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 export function SidePanel() {
   const [infoOpen, setInfoOpen] = useState(false)

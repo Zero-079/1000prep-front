@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from "react"
 import { ShoppingCart, X, Minus, Plus, ShoppingBag } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
-import { useCart } from "@/components/1000prep/cart-context"
-import { cn } from "@/src/lib/utils"
+import { Button } from "@//components/ui/button"
+import { useCart } from "@/features/meals/context/cart-context"
+import { cn } from "../../../lib/utils"
 
 export function MiniCart() {
   const { items, totalItems, totalPrice, updateQuantity, removeItem } = useCart()

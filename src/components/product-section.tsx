@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Button } from "@/src/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { ArrowRight, UtensilsCrossed, Dumbbell, Stethoscope } from "lucide-react"
-import { ScrollBlurText } from "@/src/components/scroll-blur-text"
+import { ScrollBlurText } from "@/components/scroll-blur-text"
 
 const services = [
   {

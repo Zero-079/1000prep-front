@@ -34,7 +34,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 
 

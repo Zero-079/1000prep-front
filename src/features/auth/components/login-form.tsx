@@ -3,10 +3,10 @@
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
-import { Button } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
-import { Label } from "@/src/components/ui/label"
-import { Checkbox } from "@/src/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export interface LoginData {
   email: string

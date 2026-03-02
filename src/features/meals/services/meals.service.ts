@@ -1,6 +1,6 @@
 // src/features/meals/services/meals.service.ts
 import { fetchAPI } from '@/config/api'
-import type { Meal } from '@/lib/types/meal'
+import type { Meal } from '../../../lib/types/meal'
 
 export const mealsService = {
   async getDailyMeals(date?: string, mealType?: string) {

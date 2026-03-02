@@ -9,12 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/src/components/ui/dialog"
-import { Button } from "@/src/components/ui/button"
-import { Badge } from "@/src/components/ui/badge"
-import { Separator } from "@/src/components/ui/separator"
-import type { Meal } from "@/src/lib/meals-data"
-import { useCart } from "@/components/1000prep/cart-context"
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import type { Meal } from "../../../lib/meals-data"
+import { useCart } from "@/features/meals/context/cart-context"
 
 interface MealDetailModalProps {
   meal: Meal | null

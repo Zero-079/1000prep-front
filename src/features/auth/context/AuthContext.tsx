@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
-import { authService } from '../services/auth.service';
+import { authService } from '@/features/auth/services/auth.service';
 import { tr } from 'date-fns/locale';
 
 interface User {
@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`,
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
           {
             method: 'GET',
             credentials: 'include', // Enviar cookies
