@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Plus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import type { Meal } from "../../../lib/meals-data"
+import type { Meal } from "@/lib/meals-data"
 import { useCart } from "@/features/meals/context/cart-context"
 
 interface MealCardProps {

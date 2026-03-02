@@ -1,30 +1,46 @@
 // src/features/meals/hooks/useMeals.ts
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { mealsService } from '../services/meals.service'
-import type { Meal } from '../../../lib/types/meal'
+import { useState, useEffect, useMemo } from 'react';
+import { mealsService } from '../services/meals.service';
+import type { MealParsed, MealType } from '../types/meal';
 
-export function useMeals(date?: string, mealType?: string) {
-  const [meals, setMeals] = useState<Meal[] | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export type FilterOption = MealType | "ALL";
+
+export function useMeals() {
+  const [meals, setMeals] = useState<MealParsed[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<FilterOption>("ALL");
 
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        setLoading(true)
-        const { meals: data } = await mealsService.getDailyMeals(date, mealType)
-        setMeals(data)
+        setIsLoading(true);
+        setError(null);
+        const data = await mealsService.getMeals();
+        setMeals(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido')
+        setError(err instanceof Error ? err.message : 'Error al cargar las comidas');
       } finally {
-        setLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchMeals()
-  }, [date, mealType])
+    fetchMeals();
+  }, []);
 
-  return { meals, loading, error }
+  // Filtrado reactivo en el frontend
+  const filteredMeals = useMemo(() => {
+    if (activeFilter === "ALL") return meals;
+    return meals.filter((meal) => meal.mealType === activeFilter);
+  }, [meals, activeFilter]);
+
+  return {
+    meals: filteredMeals,
+    isLoading,
+    error,
+    activeFilter,
+    setActiveFilter,
+  };
 }

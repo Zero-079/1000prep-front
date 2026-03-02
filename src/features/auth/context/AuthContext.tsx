@@ -2,8 +2,7 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
-import { authService } from '@/features/auth/services/auth.service';
-import { tr } from 'date-fns/locale';
+import { fetchAPI } from '@/config/api'; // Asegúrate de importar fetchAPI
 
 interface User {
   id: string;
@@ -32,16 +31,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-          {
-            method: 'GET',
-            credentials: 'include', // Enviar cookies
-          }
-        );
+        // Usar fetchAPI en lugar del fetch crudo. 
+        // fetchAPI ya concatena bien el API_BASE_URL y le pone credentials: 'include'
+        const data = await fetchAPI<{ user: User }>('/auth/me', {
+          method: 'GET',
+        });
 
-        if (res.ok) {
-          const data = await res.json();
+        if (data && data.user) {
           setUser(data.user);
           setIsAuthenticated(true);
         } else {
@@ -49,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIsAuthenticated(false);
         }
       } catch (error) {
+        // Si hay error (ej: 401 Unauthorized), limpiar sesión
         setUser(null);
         setIsAuthenticated(false);
       } finally {
