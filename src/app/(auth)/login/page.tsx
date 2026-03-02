@@ -1,7 +1,7 @@
 "use client"
 
-import { LoginForm } from "@/components/auth"
-import type { LoginData } from "@/components/auth"
+import { LoginForm } from "@/features/auth/components"
+import type { LoginData } from "@/features/auth/components"
 
 import { useAuth } from '../../../features/auth/hooks/useAuth'
 

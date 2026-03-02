@@ -5,9 +5,9 @@ import { ScienceSection } from "@/components/science-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { Footer } from "@/components/footer"
 
-import { useAuth } from '@/src/features/auth/hooks/useAuth'
-import { LoginForm } from '@/components/auth'
-import type { LoginData } from '@/components/auth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { LoginForm } from '@/features/auth/components'
+import type { LoginData } from '@/features/auth/components'
 
 export default function Home() {
   return (

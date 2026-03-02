@@ -1,8 +1,8 @@
 "use client"
 
-import { RegisterForm } from "@/components/auth"
-import type { RegisterData } from "@/components/auth"
-import { useAuth } from '@/src/features/auth/hooks/useAuth'
+import { RegisterForm } from "@/features/auth/components"
+import type { RegisterData } from "@/features/auth/components"
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function RegisterPage() {
   const { register, isLoading, error } = useAuth()

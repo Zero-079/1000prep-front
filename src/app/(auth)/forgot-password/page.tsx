@@ -1,7 +1,7 @@
 "use client"
 
-import { ForgotPasswordForm } from "@/components/auth"
-import type { ResetPasswordData } from "@/components/auth"
+import { ForgotPasswordForm } from "@/features/auth/components"
+import type { ResetPasswordData } from "@/features/auth/components"
 
 export default function ForgotPasswordPage() {
   async function handleResetPassword(data: ResetPasswordData) {
