@@ -186,7 +186,7 @@ export default function MilprepPage() {
                   size="lg"
                   asChild
                 >
-                  <a href="#">
+                  <a href="/planes">
                     Ver Planes
                     <ArrowRight className="size-4" />
                   </a>

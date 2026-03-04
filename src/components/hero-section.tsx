@@ -86,8 +86,10 @@ export function HeroSection() {
               size="lg"
               className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-base group"
             >
-              Empieza Tu Transformacion Hoy
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Link href="/planes">
+                Empieza Tu Transformacion Hoy
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
             <Button
               size="lg"
