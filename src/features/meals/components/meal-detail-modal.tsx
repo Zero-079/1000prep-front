@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import type { Meal } from "../../../lib/meals-data"
+import type { Meal } from "@/features/meals/types/meal"
 import { useCart } from "@/features/meals/context/cart-context"
 
 interface MealDetailModalProps {
@@ -76,12 +76,12 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
                 <Star
                   key={i}
                   className={`size-4 ${
-                    i < Math.round(meal.rating) ? "fill-amber-400 text-amber-400" : "fill-muted text-muted"
+                    i < Math.round(meal.rating ?? 0) ? "fill-amber-400 text-amber-400" : "fill-muted text-muted"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-sm font-medium text-foreground">{meal.rating}</span>
+            <span className="text-sm font-medium text-foreground">{meal.rating ?? 0}</span>
             <span className="text-sm text-muted-foreground">({meal.reviews} resenas)</span>
           </div>
 

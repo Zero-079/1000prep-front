@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Plus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import type { Meal } from "@/lib/meals-data"
+import type { Meal } from "@/features/meals/types/meal"
 import { useCart } from "@/features/meals/context/cart-context"
 
 interface MealCardProps {
@@ -23,9 +23,28 @@ const macroDots = {
   fat: "bg-amber-300",
 }
 
+const mealTypeLabels: Record<string, string> = {
+  BREAKFAST: "Desayuno",
+  LUNCH: "Almuerzo",
+  DINNER: "Cena",
+  SNACK: "Snack",
+}
+
 export function MealCard({ meal, onOpenDetail }: MealCardProps) {
   const { addItem } = useCart()
-  const totalMacros = meal.protein + meal.carbs + meal.fat
+  const totalMacros = meal.protein + meal.carbs + meal.fat || 1 // Evitar división por cero
+  // Formato Moneda Colombiana
+  const formattedPrice = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(meal.price)
+
+  const formattedSubPrice = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(meal.subscriptionPrice)
 
   return (
     <article
@@ -42,18 +61,11 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {/* Tag badges */}
-        {meal.tags.length > 0 && (
           <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            {meal.tags.map((tag) => (
-              <Badge
-                key={tag}
-                className="bg-card/90 text-foreground backdrop-blur-sm text-[11px] font-medium border-0 shadow-sm"
-              >
-                {tag}
-              </Badge>
-            ))}
+            <Badge className="bg-card/90 text-foreground backdrop-blur-sm text-[11px] font-medium border-0 shadow-sm">
+              {mealTypeLabels[meal.mealType] || meal.mealType}
+            </Badge>
           </div>
-        )}
       </div>
 
       {/* Content */}
@@ -61,6 +73,20 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
         <div>
           <h3 className="font-semibold text-foreground text-base leading-snug">{meal.name}</h3>
           <p className="text-muted-foreground text-sm mt-1 leading-relaxed line-clamp-2">{meal.description}</p>
+        </div>
+
+        {/* Ingredientes y Alérgenos */}
+        <div className="flex flex-col gap-1 mt-1">
+          {meal.ingredients.length > 0 && (
+            <p className="text-[11px] text-muted-foreground line-clamp-1">
+              <span className="font-semibold text-foreground">Ingredientes:</span> {meal.ingredients.join(", ")}
+            </p>
+          )}
+          {meal.allergens && meal.allergens.length > 0 && (
+            <p className="text-[11px] text-destructive line-clamp-1">
+              <span className="font-semibold">Alérgenos:</span> {meal.allergens.join(", ")}
+            </p>
+          )}
         </div>
 
         {/* Macro bars */}
@@ -99,8 +125,8 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
         {/* Price + CTA */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground line-through">{meal.price.toFixed(2)}&euro;</span>
-            <span className="text-lg font-bold text-primary leading-none">{meal.subscriptionPrice.toFixed(2)}&euro;</span>
+            <span className="text-sm text-muted-foreground line-through">{formattedPrice}</span>
+            <span className="text-lg font-bold text-primary leading-none">{formattedSubPrice}</span>
           </div>
           <Button
             size="sm"

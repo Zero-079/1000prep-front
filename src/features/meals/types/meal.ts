@@ -50,4 +50,6 @@ export interface Meal {
   isActive: boolean
   ingredients: string[]
   allergens: string[]
+  rating?: number
+  reviews?: number
 }

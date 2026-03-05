@@ -1,46 +1,30 @@
-// src/features/meals/hooks/useMeals.ts
-'use client';
+"use client"
 
-import { useState, useEffect, useMemo } from 'react';
-import { mealsService } from '../services/meals.service';
-import type { MealParsed, MealType } from '../types/meal';
-
-export type FilterOption = MealType | "ALL";
+import { useState, useEffect } from "react"
+import { mealsService } from "../services/meals.service"
+import type { Meal } from "../types/meal"
 
 export function useMeals() {
-  const [meals, setMeals] = useState<MealParsed[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<FilterOption>("ALL");
+  const [meals, setMeals] = useState<Meal[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
-        const data = await mealsService.getMeals();
-        setMeals(data);
+        setIsLoading(true)
+        setError(null)
+        const data = await mealsService.getMeals()
+        setMeals(data)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar las comidas');
+        setError(err instanceof Error ? err.message : "Error al obtener las comidas")
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchMeals();
-  }, []);
+    fetchMeals()
+  }, []) // Si luego el backend filtra por fecha, puedes poner 'selectedDate' aquí
 
-  // Filtrado reactivo en el frontend
-  const filteredMeals = useMemo(() => {
-    if (activeFilter === "ALL") return meals;
-    return meals.filter((meal) => meal.mealType === activeFilter);
-  }, [meals, activeFilter]);
-
-  return {
-    meals: filteredMeals,
-    isLoading,
-    error,
-    activeFilter,
-    setActiveFilter,
-  };
+  return { meals, isLoading, error }
 }

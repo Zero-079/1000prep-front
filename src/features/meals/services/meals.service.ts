@@ -5,7 +5,7 @@ const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7
 
 export const mealsService = {
   async getMeals(): Promise<Meal[]> {
-    const rawMeals = await fetchAPI<MealRaw[]>("/meals", { method: "GET" })
+    const rawMeals = await fetchAPI<MealRaw[]>("/meals/daily", { method: "GET" })
 
     return rawMeals
       // 1. No mostrar comidas inactivas o no disponibles

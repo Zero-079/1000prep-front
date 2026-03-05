@@ -85,7 +85,7 @@ export const faqItems: FAQItem[] = [
   {
     question: "¿Cómo funciona la entrega?",
     answer:
-      "Las entregas se realizan a domicilio en Manizales y el área metropolitana. Los platos llegan en contenedores reutilizables y se entregan frescos. Puedes programar el día y hora preferida. Las entregas por suscripción son cada semana, cada 2 semanas o cada mes según tu plan.",
+      "Las entregas se realizan a domicilio en Ibagué y el área metropolitana. Los platos llegan en contenedores reutilizables y se entregan frescos. Puedes programar el día y hora preferida. Las entregas por suscripción son cada semana, cada 2 semanas o cada mes según tu plan.",
   },
   {
     question: "¿Puedo cambiar de plan?",

@@ -1,6 +1,6 @@
 "use client"
 
-import type { Meal } from "../../../lib/meals-data"
+import type { Meal } from "@/features/meals/types/meal"
 import { MealCard } from "@/features/meals/components/meal-card"
 
 interface MealsGridProps {
