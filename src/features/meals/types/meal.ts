@@ -39,7 +39,7 @@ export interface Meal {
   description: string
   image: string
   price: number
-  subscriptionPrice: number // Calculado para la UI (20% descuento)
+  subscriptionPrice: number
   protein: number
   carbs: number
   fat: number
@@ -48,8 +48,8 @@ export interface Meal {
   mealType: MealType
   isAvailable: boolean
   isActive: boolean
-  ingredients: string[]
-  allergens: string[]
+  ingredients: string[] // ✅ Ya son strings extraídos en el servicio
+  allergens: string[] // ✅ Ya son strings extraídos en el servicio
   rating?: number
   reviews?: number
 }

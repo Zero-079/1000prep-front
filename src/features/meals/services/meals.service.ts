@@ -1,9 +1,8 @@
 import { fetchAPI } from "@/config/api"
-import type { MealRaw, Meal } from "@/features/meals/types/meal"
-import { DailyMenu, DailyMenuItem } from "@/features/meals/types/daily-menu"
-import { id } from "date-fns/locale"
+import type { Meal } from "@/features/meals/types/meal"
+import { DailyMenu, DailyMenuItem, MealIngredient } from "@/features/meals/types/daily-menu"
 
-const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80" // Fallback temporal
+const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80"
 
 class MealsService {
   async getMeals(): Promise<Meal[]> {
@@ -17,19 +16,53 @@ class MealsService {
       const allMeals: DailyMenuItem[] = []
       for (const menu of dailyMenus) {
         if (menu.isActive) {
-          // Filtrar solo menús activos
           allMeals.push(...menu.meals)
         }
       }
 
-      // 3. Mapear DailyMenuItem al tipo Meal del frontend
+      // 3. Helper para extraer nombres de ingredientes
+      const extractIngredientNames = (ingredients: MealIngredient[] | string[]): string[] => {
+        if (!Array.isArray(ingredients)) return []
+        return ingredients
+          .map((item) => {
+            // Si es un objeto con estructura anidada
+            if (typeof item === "object" && item !== null && "ingredient" in item) {
+              return (item as MealIngredient).ingredient.name
+            }
+            // Si es directamente un string
+            if (typeof item === "string") {
+              return item
+            }
+            return null
+          })
+          .filter((name): name is string => name !== null)
+      }
+
+      // 4. Helper para extraer nombres de alérgenos
+      const extractAllergenNames = (allergens: any[]): string[] => {
+        if (!Array.isArray(allergens)) return []
+        return allergens
+          .map((item) => {
+            // Si es un objeto con estructura anidada
+            if (typeof item === "object" && item !== null && "allergen" in item) {
+              return item.allergen.name
+            }
+            // Si es directamente un string
+            if (typeof item === "string") {
+              return item
+            }
+            return null
+          })
+          .filter((name): name is string => name !== null)
+      }
+
+      // 5. Mapear DailyMenuItem al tipo Meal del frontend
       const meals: Meal[] = allMeals
         .filter((item) => item.meal.isActive && item.meal.isAvailable)
-        // Opcionalmente: descomenta si quieres ocultar comidas sin stock
-        // .filter((item) => item.inStock)
         .map((item) => ({
           id: item.meal.id,
           name: item.meal.name,
+          description: item.meal.description || "",
           mealType: item.meal.mealType,
           isAvailable: item.meal.isAvailable,
           isActive: item.meal.isActive,
@@ -38,15 +71,14 @@ class MealsService {
             typeof item.meal.price === "string"
               ? Math.round(parseFloat(item.meal.price) * 0.9) // 10% descuento
               : Math.round(item.meal.price * 0.9),
-          image: PLACEHOLDER_IMAGE, // Ajusta si el backend devuelve imagen
-          description: "", // Ajusta si el backend devuelve descripción
+          image: item.meal.image || PLACEHOLDER_IMAGE,
           protein: item.meal.nutrition?.protein ?? 0,
           carbs: item.meal.nutrition?.carbs ?? 0,
           fat: item.meal.nutrition?.fat ?? 0,
           calories: item.meal.nutrition?.calories ?? 0,
-          ingredients: item.meal.ingredients ?? [],
-          allergens: item.meal.allergens ?? [],
-          tags: [], // Ajusta si el backend devuelve tags
+          ingredients: extractIngredientNames(item.meal.ingredients), // ✅ Extrae nombres
+          allergens: extractAllergenNames(item.meal.allergens || []), // ✅ Extrae nombres
+          tags: [],
         }))
 
       return meals

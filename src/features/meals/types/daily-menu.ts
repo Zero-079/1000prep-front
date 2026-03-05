@@ -1,3 +1,21 @@
+export interface MealIngredient {
+  mealId: string
+  ingredientId: string
+  ingredient: {
+    id: string
+    name: string
+  }
+}
+
+export interface MealAllergen {
+  mealId: string
+  allergenId: string
+  allergen: {
+    id: string
+    name: string
+  }
+}
+
 export interface DailyMenuItem {
   id: string
   dailyMenuId: string
@@ -7,20 +25,20 @@ export interface DailyMenuItem {
   meal: {
     id: string
     name: string
+    description?: string
     mealType: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK"
     isAvailable: boolean
     isActive: boolean
-    price: string // o number, verifica qué envía el backend
+    price: string | number
+    image?: string
     nutrition: {
       protein?: number
       carbs?: number
       fat?: number
       calories?: number
-      // ... otros campos que tenga
     }
-    ingredients: string[]
-    allergens: string[]
-    // ... otros campos que necesites (image, description, subscriptionPrice, etc.)
+    ingredients: MealIngredient[]  // ✅ Array de objetos, no strings
+    allergens: MealAllergen[] | string[]  // Soporta ambos formatos
   }
 }
 
