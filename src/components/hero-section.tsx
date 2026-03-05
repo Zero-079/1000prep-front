@@ -92,11 +92,14 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button
+              
               size="lg"
               variant="outline"
               className="rounded-full px-8 py-6 text-base border-background/30 hover:bg-background/10 text-background bg-transparent backdrop-blur-sm"
             >
-              Ver Menu
+              <Link href="/1000prep">
+                Ver Menu
+              </Link>
             </Button>
           </div>
         </div>

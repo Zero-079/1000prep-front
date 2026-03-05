@@ -32,7 +32,12 @@ const mealTypeLabels: Record<string, string> = {
 
 export function MealCard({ meal, onOpenDetail }: MealCardProps) {
   const { addItem } = useCart()
-  const totalMacros = meal.protein + meal.carbs + meal.fat || 1 // Evitar división por cero
+
+  const protein = typeof meal.protein === "number" ? meal.protein : parseFloat(String(meal.protein)) || 0
+  const carbs = typeof meal.carbs === "number" ? meal.carbs : parseFloat(String(meal.carbs)) || 0
+  const fat = typeof meal.fat === "number" ? meal.fat : parseFloat(String(meal.fat)) || 0
+
+  const totalMacros = protein + carbs + fat || 1 // Evitar división por cero
   // Formato Moneda Colombiana
   const formattedPrice = new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -94,15 +99,15 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
           <div className="flex h-2 rounded-full overflow-hidden bg-muted">
             <div
               className={`${macroColors.protein} transition-all`}
-              style={{ width: `${(meal.protein / totalMacros) * 100}%` }}
+              style={{ width: `${(protein / totalMacros) * 100}%` }}
             />
             <div
               className={`${macroColors.carbs} transition-all`}
-              style={{ width: `${(meal.carbs / totalMacros) * 100}%` }}
+              style={{ width: `${(carbs / totalMacros) * 100}%` }}
             />
             <div
               className={`${macroColors.fat} transition-all`}
-              style={{ width: `${(meal.fat / totalMacros) * 100}%` }}
+              style={{ width: `${(fat / totalMacros) * 100}%` }}
             />
           </div>
           <div className="flex justify-between text-[11px] text-muted-foreground">
