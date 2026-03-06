@@ -28,6 +28,24 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
 
   if (!meal) return null
 
+  // Normalizar ingredientes igual que en MealCard
+  const normalizedIngredients = Array.isArray(meal.ingredients)
+    ? (meal.ingredients as any[])
+        .map((ing) => {
+          if (typeof ing === "string") return ing
+          if (ing && typeof ing === "object") {
+            if ("ingredient" in ing && ing.ingredient?.name) {
+              return ing.ingredient.name as string
+            }
+            if ("name" in ing && typeof ing.name === "string") {
+              return ing.name as string
+            }
+          }
+          return null
+        })
+        .filter((name): name is string => !!name)
+    : []
+
   const handleAdd = () => {
     addItem(meal, quantity)
     setQuantity(1)
@@ -39,13 +57,15 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-2xl">
         {/* Image */}
         <div className="relative aspect-video w-full overflow-hidden rounded-t-2xl">
-          <Image
-            src={meal.image}
-            alt={meal.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 672px"
-          />
+          {meal.image && (
+            <Image
+              src={meal.image}
+              alt={meal.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, 672px"
+            />
+          )}
           {meal.tags.length > 0 && (
             <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
               {meal.tags.map((tag) => (
@@ -99,9 +119,12 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
           <div>
             <h4 className="font-semibold text-foreground text-sm mb-2">Ingredientes</h4>
             <div className="flex flex-wrap gap-1.5">
-              {meal.ingredients.map((ing) => (
-                <span key={ing} className="bg-muted text-muted-foreground text-xs px-2.5 py-1 rounded-full">
-                  {ing}
+              {normalizedIngredients.map((name, index) => (
+                <span
+                  key={`${name}-${index}`}
+                  className="bg-muted text-muted-foreground text-xs px-2.5 py-1 rounded-full"
+                >
+                  {name}
                 </span>
               ))}
             </div>
@@ -116,8 +139,11 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
               </h4>
               <div className="flex flex-wrap gap-1.5">
                 {meal.allergens.map((a) => (
-                  <span key={a} className="bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2.5 py-1 rounded-full font-medium">
-                    {a}
+                  <span
+                    key={typeof a === "string" ? a : JSON.stringify(a)}
+                    className="bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2.5 py-1 rounded-full font-medium"
+                  >
+                    {typeof a === "string" ? a : (a as any)?.allergen?.name ?? (a as any)?.name ?? ""}
                   </span>
                 ))}
               </div>
@@ -163,7 +189,17 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
   )
 }
 
-function MacroCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
+function MacroCard({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  color: string
+}) {
   return (
     <div className="flex flex-col items-center gap-1.5 bg-muted/50 rounded-xl p-3">
       <div className={color}>{icon}</div>

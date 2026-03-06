@@ -33,6 +33,24 @@ const mealTypeLabels: Record<string, string> = {
 export function MealCard({ meal, onOpenDetail }: MealCardProps) {
   const { addItem } = useCart()
 
+  // Normalizar ingredientes: soporta string[] o array de objetos { ingredient: { name } }
+  const normalizedIngredients = Array.isArray(meal.ingredients)
+    ? (meal.ingredients as any[])
+        .map((ing) => {
+          if (typeof ing === "string") return ing
+          if (ing && typeof ing === "object") {
+            if ("ingredient" in ing && ing.ingredient?.name) {
+              return ing.ingredient.name as string
+            }
+            if ("name" in ing && typeof ing.name === "string") {
+              return ing.name as string
+            }
+          }
+          return null
+        })
+        .filter((name): name is string => !!name)
+    : []
+
   const protein = typeof meal.protein === "number" ? meal.protein : parseFloat(String(meal.protein)) || 0
   const carbs = typeof meal.carbs === "number" ? meal.carbs : parseFloat(String(meal.carbs)) || 0
   const fat = typeof meal.fat === "number" ? meal.fat : parseFloat(String(meal.fat)) || 0
@@ -67,17 +85,17 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
-          // ✅ Si no hay imagen: fondo neutro con ícono
+          // Si no hay imagen: fondo neutro con ícono
           <div className="w-full h-full flex items-center justify-center bg-muted">
             <span className="text-4xl">🍽️</span>
           </div>
-        )}  
+        )}
         {/* Tag badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            <Badge className="bg-card/90 text-foreground backdrop-blur-sm text-[11px] font-medium border-0 shadow-sm">
-              {mealTypeLabels[meal.mealType] || meal.mealType}
-            </Badge>
-          </div>
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+          <Badge className="bg-card/90 text-foreground backdrop-blur-sm text-[11px] font-medium border-0 shadow-sm">
+            {mealTypeLabels[meal.mealType] || meal.mealType}
+          </Badge>
+        </div>
       </div>
 
       {/* Content */}
@@ -89,9 +107,10 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
 
         {/* Ingredientes y Alérgenos */}
         <div className="flex flex-col gap-1 mt-1">
-          {meal.ingredients.length > 0 && (
+          {normalizedIngredients.length > 0 && (
             <p className="text-[11px] text-muted-foreground line-clamp-1">
-              <span className="font-semibold text-foreground">Ingredientes:</span> {meal.ingredients.join(", ")}
+              <span className="font-semibold text-foreground">Ingredientes:</span>{" "}
+              {normalizedIngredients.join(", ")}
             </p>
           )}
           {meal.allergens && meal.allergens.length > 0 && (
