@@ -67,7 +67,7 @@ class MealsService {
       const meals: Meal[] = allMeals
         .filter((item) => item.meal.isActive && item.meal.isAvailable)
         .map((item) => {
-          const rawImageUrl = item.meal.imageURL as string | null | undefined
+          const rawImageUrl = item.meal.imageUrl as string | null | undefined
           const normalizedImage =
             rawImageUrl && rawImageUrl.trim() !== ""
               ? rawImageUrl.trim()
