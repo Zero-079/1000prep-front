@@ -26,6 +26,7 @@ export interface DailyMenuItem {
     id: string
     name: string
     description?: string
+    imageURL?: string | null
     mealType: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK"
     isAvailable: boolean
     isActive: boolean

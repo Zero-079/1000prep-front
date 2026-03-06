@@ -2,8 +2,6 @@ import { fetchAPI } from "@/config/api"
 import type { Meal } from "@/features/meals/types/meal"
 import { DailyMenu, DailyMenuItem, MealIngredient } from "@/features/meals/types/daily-menu"
 
-const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80"
-
 class MealsService {
   // Helper para convertir string a número
   private parseNumeric(value: any): number {
@@ -47,6 +45,9 @@ class MealsService {
       .filter((name): name is string => name !== null)
   }
 
+
+
+  // 3. Mapear DailyMenuItem al tipo Meal del frontend
   async getMeals(): Promise<Meal[]> {
     try {
       // 1. Obtener menús diarios del backend
@@ -54,7 +55,7 @@ class MealsService {
         method: "GET",
       })
 
-      // 2. Extraer todas las comidas de todos los menús
+      // 2. Extraer todas las comidas de todos los menús activos
       const allMeals: DailyMenuItem[] = []
       for (const menu of dailyMenus) {
         if (menu.isActive) {
@@ -65,29 +66,38 @@ class MealsService {
       // 3. Mapear DailyMenuItem al tipo Meal del frontend
       const meals: Meal[] = allMeals
         .filter((item) => item.meal.isActive && item.meal.isAvailable)
-        .map((item) => ({
-          id: item.meal.id,
-          name: item.meal.name,
-          description: item.meal.description || "",
-          mealType: item.meal.mealType,
-          isAvailable: item.meal.isAvailable,
-          isActive: item.meal.isActive,
-          price: typeof item.meal.price === "string" ? parseFloat(item.meal.price) : item.meal.price,
-          subscriptionPrice:
-            typeof item.meal.price === "string"
-              ? Math.round(parseFloat(item.meal.price) * 0.9)
-              : Math.round(item.meal.price * 0.9),
-          image: item.meal.image || PLACEHOLDER_IMAGE,
-          // ✅ PARSEAR MACROS: Convertir strings a números
-          protein: this.parseNumeric(item.meal.nutrition?.protein),
-          carbs: this.parseNumeric(item.meal.nutrition?.carbs),
-          fat: this.parseNumeric(item.meal.nutrition?.fat),
-          calories: this.parseNumeric(item.meal.nutrition?.calories),
-          ingredients: this.extractIngredientNames(item.meal.ingredients),
-          allergens: this.extractAllergenNames(item.meal.allergens || []),
-          tags: [],
-        }))
+        .map((item) => {
+          const rawImageUrl = item.meal.imageURL as string | null | undefined
+          const normalizedImage =
+            rawImageUrl && rawImageUrl.trim() !== ""
+              ? rawImageUrl.trim()
+              : null
 
+          return {
+            id: item.meal.id,
+            name: item.meal.name,
+            description: item.meal.description || "",
+            mealType: item.meal.mealType,
+            isAvailable: item.meal.isAvailable,
+            isActive: item.meal.isActive,
+            price:
+              typeof item.meal.price === "string"
+                ? parseFloat(item.meal.price)
+                : item.meal.price,
+            subscriptionPrice:
+              typeof item.meal.price === "string"
+                ? Math.round(parseFloat(item.meal.price) * 0.9)
+                : Math.round(item.meal.price * 0.9),
+            image: normalizedImage, // ✅ Usa Cloudinary o null
+            protein: this.parseNumeric(item.meal.nutrition?.protein),
+            carbs: this.parseNumeric(item.meal.nutrition?.carbs),
+            fat: this.parseNumeric(item.meal.nutrition?.fat),
+            calories: this.parseNumeric(item.meal.nutrition?.calories),
+            ingredients: (item.meal.ingredients as any[]) ?? [],
+            allergens: (item.meal.allergens as any[]) ?? [],
+            tags: [],
+          }
+        })
       return meals
     } catch (error) {
       console.error("Error fetching meals:", error)

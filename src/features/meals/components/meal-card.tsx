@@ -58,13 +58,20 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
     >
       {/* Image */}
       <div className="relative aspect-video overflow-hidden">
-        <Image
-          src={meal.image}
-          alt={meal.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
+        {meal.image ? (
+          <Image
+            src={meal.image}
+            alt={meal.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          // ✅ Si no hay imagen: fondo neutro con ícono
+          <div className="w-full h-full flex items-center justify-center bg-muted">
+            <span className="text-4xl">🍽️</span>
+          </div>
+        )}  
         {/* Tag badges */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
             <Badge className="bg-card/90 text-foreground backdrop-blur-sm text-[11px] font-medium border-0 shadow-sm">

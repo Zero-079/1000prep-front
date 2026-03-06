@@ -37,7 +37,7 @@ export interface Meal {
   id: string
   name: string
   description: string
-  image: string
+  image: string | null
   price: number
   subscriptionPrice: number
   protein: number
