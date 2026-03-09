@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X, User, Settings, ShoppingCart, Package, LogOut, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -50,10 +51,12 @@ export function Header(){
         <div className="flex items-center justify-between h-16 md:h-20 px-4 md:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-sans text-sm font-bold">1K</span>
-            </div>
-            <span className="font-serif text-foreground text-xl md:text-2xl font-semibold">1000Prep</span>
+            <Image 
+            src="/logo_1000prep_nobg.png" 
+            alt="1000Prep Logo" 
+            width={120} 
+            height={32} 
+            priority />
           </Link>
 
           {/* Desktop Navigation */}
