@@ -37,7 +37,7 @@ function getInitials(name: string) {
 const navLinks = [
   { href: "/", label: "Inicio" },
   { href: "/1000prep", label: "1000Prep" },
-  { href: "/#suplementos", label: "Suplementos" },
+  { href: "/suplementos", label: "Suplementos" },
   { href: "/#nutricionista", label: "Nutricionista" },
 ]
 
