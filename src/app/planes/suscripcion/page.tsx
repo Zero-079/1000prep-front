@@ -46,7 +46,7 @@ function SubscriptionContent() {
       <Header />
 
       {/* Main Content */}
-      <section className="py-12 px-6 lg:px-8">
+      <section className="pt-32 py-12 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumb */}
           <div className="mb-8 text-sm text-muted-foreground">
