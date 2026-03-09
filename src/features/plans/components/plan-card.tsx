@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Plan } from "@/lib/plans-data"
@@ -8,15 +9,15 @@ interface PlanCardProps {
   plan: Plan
   paymentType: "onetime" | "subscription"
   isCurrentPlan?: boolean
-  onSelect?: (planId: string) => void
 }
 
 export function PlanCard({
   plan,
   paymentType,
   isCurrentPlan = false,
-  onSelect,
 }: PlanCardProps) {
+  const router = useRouter()
+
   const shouldShowDiscount =
     paymentType === "subscription" && plan.subscriptionDiscount > 0
   const discountedPrice = shouldShowDiscount
@@ -29,6 +30,15 @@ export function PlanCard({
       currency: "COP",
       minimumFractionDigits: 0,
     }).format(price)
+  }
+
+  const handleSelectPlan = () => {
+    // Redirect to subscription flow with plan and billing type
+    const params = new URLSearchParams({
+      planId: plan.id,
+      billingType: paymentType,
+    })
+    router.push(`/planes/suscripcion?${params.toString()}`)
   }
 
   return (
@@ -92,7 +102,7 @@ export function PlanCard({
 
         {/* Button */}
         <Button
-          onClick={() => onSelect?.(plan.id)}
+          onClick={handleSelectPlan}
           disabled={isCurrentPlan}
           className="w-full rounded-full py-6 font-medium"
           variant={isCurrentPlan ? "outline" : "default"}
