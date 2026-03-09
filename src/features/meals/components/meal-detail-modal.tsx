@@ -28,6 +28,12 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
 
   if (!meal) return null
 
+  const formattedSubPrice = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(meal.subscriptionPrice)
+
   // Normalizar ingredientes igual que en MealCard
   const normalizedIngredients = Array.isArray(meal.ingredients)
     ? (meal.ingredients as any[])
@@ -180,7 +186,7 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
               size="lg"
               onClick={handleAdd}
             >
-              Agregar al Carrito - {(meal.subscriptionPrice * quantity).toFixed(2)}&euro;
+              Agregar al Carrito - {formattedSubPrice}
             </Button>
           </div>
         </div>

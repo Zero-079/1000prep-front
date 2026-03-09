@@ -58,7 +58,13 @@ export function MiniCart() {
                 <li key={item.meal.id} className="p-3 flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{item.meal.name}</p>
-                    <p className="text-xs text-primary font-semibold">{(item.meal.subscriptionPrice * item.quantity).toFixed(2)}&euro;</p>
+                    <p className="text-xs text-primary font-semibold">
+                      {new Intl.NumberFormat("es-CO", {
+                        style: "currency",
+                        currency: "COP",
+                        minimumFractionDigits: 0,
+                      }).format(item.meal.subscriptionPrice * item.quantity)}
+                    </p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
@@ -88,7 +94,13 @@ export function MiniCart() {
           <div className="p-4 border-t border-border flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Total</span>
-              <span className="text-base font-bold text-foreground">{totalPrice.toFixed(2)}&euro;</span>
+              <span className="text-base font-bold text-foreground">
+                {new Intl.NumberFormat("es-CO", {
+                  style: "currency",
+                  currency: "COP",
+                  minimumFractionDigits: 0,
+                }).format(totalPrice)}
+              </span>
             </div>
             <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 w-full" size="sm">
               Ver Carrito Completo
