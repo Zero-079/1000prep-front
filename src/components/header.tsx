@@ -237,7 +237,7 @@ function AccountMenu({
           <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
             <Link href="/cuenta">
               <Settings className="size-4" />
-              <span>Mi cuenta / Configuracion</span>
+              <span>Mi cuenta</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">

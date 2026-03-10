@@ -29,7 +29,7 @@ export function Step2Dishes({ onBack, onContinue }: Step2DishesProps) {
 
   const total = Object.values(quantities).reduce((sum, qty) => sum + qty, 0)
   const isLimitReached = total >= maxTotal
-  const canContinue = total > 0
+  const canContinue = total === maxTotal
 
   const updateQuantity = (dishId: string, change: number) => {
     const newQuantities = { ...quantities }
