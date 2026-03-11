@@ -61,6 +61,7 @@ export interface Meal {
   calories: number
   tags: string[]
   mealType: MealType
+  fitnessGoal: FitnessGoal
   isAvailable: boolean
   isActive: boolean
   ingredients: string[]

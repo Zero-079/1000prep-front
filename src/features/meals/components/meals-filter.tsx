@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { CalendarIcon, UtensilsCrossed } from "lucide-react"
-import { MealsGrid } from "./meals-grid"
+import { MealCard } from "./meal-card"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -13,18 +13,28 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import type { Meal, MealType } from "@/features/meals/types/meal"
+import type { Meal, FitnessGoal } from "@/features/meals/types/meal"
 
-type FilterOption = MealType | "Todos"
+type FilterOption = FitnessGoal | "ALL"
 
-const filterOptions: FilterOption[] = ["Todos", "BREAKFAST", "LUNCH", "DINNER", "SNACK"]
+const filterOptions: FilterOption[] = [
+  "ALL",
+  "MUSCLE_GAIN",
+  "WEIGHT_LOSS",
+  "MAINTENANCE",
+]
 
-const mealTypeLabels: Record<FilterOption, string> = {
-  Todos: "Todos",
-  BREAKFAST: "Desayuno",
-  LUNCH: "Almuerzo",
-  DINNER: "Cena",
-  SNACK: "Snacks",
+const fitnessGoalLabels: Record<FilterOption, string> = {
+  ALL: "Todos",
+  MUSCLE_GAIN: "Ganar músculo",
+  WEIGHT_LOSS: "Perder peso",
+  MAINTENANCE: "Mantenimiento",
+}
+
+const fitnessGoalDescriptions: Record<Exclude<FilterOption, "ALL">, string> = {
+  MUSCLE_GAIN: "Comidas altas en proteína",
+  WEIGHT_LOSS: "Comidas hipocalóricas",
+  MAINTENANCE: "Comidas balanceadas",
 }
 
 interface MealsFilterProps {
@@ -40,14 +50,14 @@ export function MealsFilter({
   isLoading = false,
   error = null,
 }: MealsFilterProps) {
-  const [activeFilter, setActiveFilter] = useState<FilterOption>("Todos")
+  const [activeFilter, setActiveFilter] = useState<FilterOption>("ALL")
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [calendarOpen, setCalendarOpen] = useState(false)
 
-  // Filtrar comidas por tipo
+  // Filtrar comidas por FitnessGoal
   const filteredMeals = useMemo(() => {
-    if (activeFilter === "Todos") return meals
-    return meals.filter((m) => m.mealType === activeFilter)
+    if (activeFilter === "ALL") return meals
+    return meals.filter((meal) => meal.fitnessGoal === activeFilter)
   }, [meals, activeFilter])
 
   return (
@@ -97,7 +107,7 @@ export function MealsFilter({
             </PopoverContent>
           </Popover>
 
-          {/* Filter chips */}
+          {/* Filter chips - ACTUALIZADO */}
           <div className="flex flex-wrap gap-2">
             {filterOptions.map((filter) => (
               <button
@@ -109,15 +119,20 @@ export function MealsFilter({
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-background text-muted-foreground border-border hover:bg-muted hover:text-foreground"
                 )}
+                title={
+                  filter !== "ALL"
+                    ? fitnessGoalDescriptions[filter]
+                    : undefined
+                }
               >
-                {mealTypeLabels[filter]}
+                {fitnessGoalLabels[filter]}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Meals Grid */}
+      {/* Meals Grid - INLINED */}
       <div className="px-6 pb-6 md:px-8 md:pb-8">
         {isLoading ? (
           /* Esqueleto Visual */
@@ -133,8 +148,25 @@ export function MealsFilter({
           <div className="py-16 text-center text-destructive font-medium bg-red-50 rounded-2xl">
             <p>{error}</p>
           </div>
+        ) : filteredMeals.length === 0 ? (
+          <div className="col-span-full py-16 text-center">
+            <p className="text-muted-foreground text-lg">
+              No hay comidas con este filtro.
+            </p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Prueba con otro filtro o revisa el menu de otro dia.
+            </p>
+          </div>
         ) : (
-          <MealsGrid meals={filteredMeals} onOpenDetail={onOpenDetail} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredMeals.map((meal) => (
+              <MealCard
+                key={meal.id}
+                meal={meal}
+                onOpenDetail={onOpenDetail}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

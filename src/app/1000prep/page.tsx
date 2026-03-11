@@ -7,7 +7,7 @@ import type { HeaderUser } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartProvider } from "@/features/meals/context/cart-context"
 import { MealsHero } from "@/features/meals/components/meals-hero"
-import { MealsFilter } from "@/features/meals/components/meals-filter" // ✅ NUEVO
+import { MealsFilter } from "@/features/meals/components/meals-filter"
 import { MealDetailModal } from "@/features/meals/components/meal-detail-modal"
 import { MiniCart } from "@/features/meals/components/mini-cart"
 import { Button } from "@/components/ui/button"
