@@ -1,45 +1,16 @@
-export interface MealIngredient {
-  mealId: string
-  ingredientId: string
-  ingredient: {
-    id: string
-    name: string
-  }
-}
-
-export interface MealAllergen {
-  mealId: string
-  allergenId: string
-  allergen: {
-    id: string
-    name: string
-  }
-}
+import { MealAllergen, MealIngredient, MealNutrition, MealRaw } from "./meal"
 
 export interface DailyMenuItem {
   id: string
   dailyMenuId: string
   mealId: string
   stock: number
+  mealBatchId: string | null
+  meal: MealRaw
   inStock: boolean
-  meal: {
-    id: string
-    name: string
-    description?: string
-    imageUrl?: string | null
-    mealType: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK"
-    isAvailable: boolean
-    isActive: boolean
-    price: string | number
-    nutrition: {
-      protein?: number
-      carbs?: number
-      fat?: number
-      calories?: number
-    }
-    ingredients: MealIngredient[]  // ✅ Array de objetos, no strings
-    allergens: MealAllergen[] | string[]  // Soporta ambos formatos
-  }
+  canOrder: boolean
+  orderDeadline: string 
+  matchesUserGoals: boolean
 }
 
 export interface DailyMenu {

@@ -1,4 +1,34 @@
 export type MealType = "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK"
+export type FitnessGoal = "WEIGHT_LOSS" | "MUSCLE_GAIN" | "MAINTENANCE"
+
+export interface MealNutrition {
+  id: string
+  mealId: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  fiber: number
+  sodium: number
+}
+
+export interface MealIngredient {
+  mealId: string
+  ingredientId: string
+  ingredient: {
+    id: string
+    name: string
+  }
+}
+
+export interface MealAllergen {
+  mealId: string
+  allergenId: string
+  allergen: {
+    id: string
+    name: string
+  }
+}
 
 export interface MealRaw {
   id: string
@@ -7,29 +37,14 @@ export interface MealRaw {
   imageUrl: string | null
   price: string
   mealType: MealType
+  fitnessGoal: FitnessGoal
   isAvailable: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
-  nutrition: {
-    id: string
-    mealId: string
-    calories: number
-    protein: string
-    carbs: string
-    fat: string
-    fiber: string
-    sodium: string
-  }
-  ingredients: {
-    mealId: string
-    ingredientId: string
-    ingredient: {
-      id: string
-      name: string
-    }
-  }[]
-  allergens: string[]
+  nutrition: MealNutrition
+  ingredients: MealIngredient[]
+  allergens: MealAllergen[]
 }
 
 // Este es el tipo que consumirán tus componentes (compatible con tu UI actual)
@@ -48,8 +63,8 @@ export interface Meal {
   mealType: MealType
   isAvailable: boolean
   isActive: boolean
-  ingredients: string[] // ✅ Ya son strings extraídos en el servicio
-  allergens: string[] // ✅ Ya son strings extraídos en el servicio
+  ingredients: string[]
+  allergens: string[]
   rating?: number
   reviews?: number
 }
