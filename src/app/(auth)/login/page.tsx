@@ -2,8 +2,7 @@
 
 import { LoginForm } from "@/features/auth/components"
 import type { LoginData } from "@/features/auth/components"
-
-import { useAuth } from '../../../features/auth/hooks/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function LoginPage() {
   const { login, isLoading, error } = useAuth()

@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, UtensilsCrossed, Dumbbell, Stethoscope } from "lucide-react"
 import { ScrollBlurText } from "@/components/scroll-blur-text"
+import Link from "next/link" 
+import { hr } from "date-fns/locale"
 
 const services = [
   {
@@ -13,6 +15,7 @@ const services = [
     image: "/images/card-meals.jpg",
     tag: "1000Prep Comidas",
     cta: "Ver Menu",
+    href: "1000prep",
   },
   {
     icon: Dumbbell,
@@ -21,6 +24,7 @@ const services = [
     image: "/images/card-supplements.jpg",
     tag: "Suplementacion",
     cta: "Explorar Catalogo",
+    href: "suplementos",
   },
   {
     icon: Stethoscope,
@@ -99,10 +103,13 @@ export function ProductSection() {
                   </div>
                   <p className="text-muted-foreground leading-relaxed mb-6 flex-1">{service.description}</p>
                   <Button
+                    asChild
                     className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full group/btn w-full"
                   >
-                    {service.cta}
-                    <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <Link href={service.href ?? "#"}>
+                      {service.cta}
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    </Link>
                   </Button>
                 </div>
               </div>

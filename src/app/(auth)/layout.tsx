@@ -1,8 +1,21 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex">
+      <Link
+        href="/"
+        className="fixed top-4 left-4 z-50 flex items-center gap-2 text-white bg-transparent border-none  hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b8a3e]/40 rounded-full px-3 py-1.5"
+      >
+        <span aria-hidden="true" className="text-lg leading-none font-bold">
+          ←
+        </span>
+        <span className="text-sm md:text-base font-bold hover:underline">
+          Volver al inicio
+        </span>
+      </Link>
+
       {/* Left panel - branding */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-primary items-center justify-center p-12 overflow-hidden">
         {/* Subtle pattern overlay */}
@@ -13,11 +26,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="relative z-10 max-w-md text-center flex flex-col items-center gap-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="size-12 rounded-xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
-              <span className="text-primary-foreground font-sans text-lg font-bold">1K</span>
-            </div>
-            <span className="font-serif text-primary-foreground text-3xl font-semibold">1000Prep</span>
+          
+          <Link href="/" className="flex items-center justify-center">
+            <Image 
+            src="/logo_removebg2.png" 
+            alt="1000Prep Logo" 
+            width={220} 
+            height={64} 
+            className="h-26 w-auto" />
           </Link>
           <h2 className="text-primary-foreground text-2xl font-serif font-semibold leading-relaxed text-balance">
             Comida saludable, preparada con precision nutricional
@@ -49,13 +65,18 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex justify-center mb-8">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="size-9 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-sans text-sm font-bold">1K</span>
-              </div>
-              <span className="font-serif text-foreground text-2xl font-semibold">1000Prep</span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo_1000prep_nobg.png"
+                alt="1000Prep"
+                width={180}
+                height={48}
+                priority
+                className="h-12 w-auto"
+              />
             </Link>
           </div>
+
           {children}
         </div>
       </div>
