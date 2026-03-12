@@ -70,10 +70,6 @@ export function SubscriptionFlow({
             <p className="text-center text-muted-foreground">
               Verificando sesión...
             </p>
-          ) : !isAuthenticated ? (
-            <p className="text-center text-muted-foreground">
-              Debes iniciar sesión para continuar.
-            </p>
           ) : (
             <Step2Dishes
               fitnessGoal={objective}

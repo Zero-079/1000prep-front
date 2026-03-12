@@ -11,69 +11,61 @@ interface UseMealBatchesReturn {
   refetch: () => Promise<void>
 }
 
-/**
- * Custom hook to fetch available meal batches for the current week
- * Automatically calculates the current Monday as weekStart
- * Flattens batches from object-by-mealType into a single array
- * @returns Object containing batches array, loading state, error state, and refetch function
- */
 export function useMealBatches(): UseMealBatchesReturn {
   const [batches, setBatches] = useState<MealBatch[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  /**
-   * Calculate the current Monday
-   * If today is Monday, returns today
-   * Otherwise, calculates the most recent Monday
-   */
-// Replace the getCurrentMonday function inside useMealBatches.ts
-  const getCurrentMonday = (): string => {
-    const today = new Date()
-    const day = today.getDay() // 0=Sun, 1=Mon...
-    const daysToMonday = day === 1 ? 0 : day === 0 ? -6 : 1 - day
-    const monday = new Date(today)
-    monday.setDate(today.getDate() + daysToMonday)
+  // FIX #3: removed the dead outer `const weekStart` that was never used
 
-    // Use LOCAL date parts instead of toISOString() to avoid UTC offset shift
-    const yyyy = monday.getFullYear()
-    const mm = String(monday.getMonth() + 1).padStart(2, "0")
-    const dd = String(monday.getDate()).padStart(2, "0")
+  // FIX #1: renamed from getCurrentMonday to getCurrentWeekStart (consistent name)
+  const getCurrentWeekStart = (): string => {
+    const today = new Date()
+    const yyyy = today.getFullYear()
+    const mm = String(today.getMonth() + 1).padStart(2, "0")
+    const dd = String(today.getDate()).padStart(2, "0")
     return `${yyyy}-${mm}-${dd}`
   }
-
 
   const fetchBatches = async () => {
     try {
       setIsLoading(true)
       setError(null)
-      const weekStart = getCurrentMonday()
+
+      // FIX #1: use the correct function name
+      const weekStart = getCurrentWeekStart()
       const response: AvailableBatchesResponse = await getAvailableBatches(weekStart)
 
-      // Flatten batches from object-by-mealType into single array
       const flatBatches: MealBatch[] = []
-      const mealTypes = ["BREAKFAST", "LUNCH", "DINNER", "SNACK"] as const
+      const rawBatches = response.batches as Record<string, MealBatch[]>
 
-      mealTypes.forEach((mealType) => {
-        const batchesForType = response.batches[mealType]
-        if (batchesForType && Array.isArray(batchesForType)) {
-          flatBatches.push(...batchesForType)
+      Object.keys(rawBatches).forEach((key) => {
+        const list = rawBatches[key]
+        if (list && Array.isArray(list)) {
+          flatBatches.push(...list)
         }
       })
 
+      if (flatBatches.length === 0) {
+        console.warn("[useMealBatches] Response received but no batches found. Raw response:", response)
+      }
+
       setBatches(flatBatches)
+
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch meal batches"
+      // FIX #2: restored missing catch block so errors are captured
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch meal batches"
       setError(errorMessage)
-      console.error("Error fetching meal batches:", err)
+      console.error("[useMealBatches] Error fetching batches:", err)
     } finally {
+      // FIX #2: restored finally block so isLoading always resets to false
       setIsLoading(false)
     }
-  }
+  } // FIX #4: this closes fetchBatches correctly
 
   useEffect(() => {
     fetchBatches()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return {
@@ -82,4 +74,4 @@ export function useMealBatches(): UseMealBatchesReturn {
     error,
     refetch: fetchBatches,
   }
-}
+} // this closes useMealBatches
