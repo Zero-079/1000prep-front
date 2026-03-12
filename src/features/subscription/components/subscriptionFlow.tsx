@@ -65,6 +65,7 @@ export function SubscriptionFlow({
         )}
         {currentStep === 2 && (
           <Step2Dishes
+            fitnessGoal={objective}
             onBack={handleBack}
             onContinue={handleStep2Continue}
           />
