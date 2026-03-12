@@ -5,6 +5,7 @@ import { ProgressBar } from "./progressBar.tsx"
 import { Step1Objective } from "./step1Objective"
 import { Step2Dishes } from "./step2Dishes"
 import { Step3Confirmation } from "./step3Confirmation"
+import { useAuthContext } from "@/features/auth/context/AuthContext"
 
 interface DishQuantity {
   [key: string]: number
@@ -26,6 +27,7 @@ export function SubscriptionFlow({
   const [currentStep, setCurrentStep] = useState(1)
   const [objective, setObjective] = useState<string | null>(null)
   const [dishSelections, setDishSelections] = useState<DishQuantity>({})
+  const { isAuthenticated, isLoading: authLoading } = useAuthContext()
 
   const totalSteps = 3
 
@@ -64,11 +66,21 @@ export function SubscriptionFlow({
           />
         )}
         {currentStep === 2 && (
-          <Step2Dishes
-            fitnessGoal={objective}
-            onBack={handleBack}
-            onContinue={handleStep2Continue}
-          />
+          authLoading ? (
+            <p className="text-center text-muted-foreground">
+              Verificando sesión...
+            </p>
+          ) : !isAuthenticated ? (
+            <p className="text-center text-muted-foreground">
+              Debes iniciar sesión para continuar.
+            </p>
+          ) : (
+            <Step2Dishes
+              fitnessGoal={objective}
+              onBack={handleBack}
+              onContinue={handleStep2Continue}
+            />
+          )
         )}
         {currentStep === 3 && (
           <Step3Confirmation

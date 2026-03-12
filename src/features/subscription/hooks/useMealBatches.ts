@@ -27,15 +27,21 @@ export function useMealBatches(): UseMealBatchesReturn {
    * If today is Monday, returns today
    * Otherwise, calculates the most recent Monday
    */
+// Replace the getCurrentMonday function inside useMealBatches.ts
   const getCurrentMonday = (): string => {
     const today = new Date()
-    const dayOfWeek = today.getDay()
-    // getDay() returns 0 for Sunday, 1 for Monday, etc.
-    const daysToMonday = dayOfWeek === 1 ? 0 : dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+    const day = today.getDay() // 0=Sun, 1=Mon...
+    const daysToMonday = day === 1 ? 0 : day === 0 ? -6 : 1 - day
     const monday = new Date(today)
     monday.setDate(today.getDate() + daysToMonday)
-    return monday.toISOString().split("T")[0]
+
+    // Use LOCAL date parts instead of toISOString() to avoid UTC offset shift
+    const yyyy = monday.getFullYear()
+    const mm = String(monday.getMonth() + 1).padStart(2, "0")
+    const dd = String(monday.getDate()).padStart(2, "0")
+    return `${yyyy}-${mm}-${dd}`
   }
+
 
   const fetchBatches = async () => {
     try {
