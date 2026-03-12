@@ -12,7 +12,7 @@ const INFO_ITEMS = [
   {
     icon: <Truck className="size-8 text-primary" />,
     title: "Envío incluido",
-    description: "En pedidos mayores a $150.000. Llegamos a toda Colombia.",
+    description: "En pedidos mayores a $150.000.",
   },
   {
     icon: <UserCheck className="size-8 text-primary" />,

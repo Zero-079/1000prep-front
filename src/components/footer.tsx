@@ -3,10 +3,10 @@ import { Mail, MapPin, Phone, Instagram, Facebook, Twitter } from "lucide-react"
 
 const footerLinks = {
   servicios: [
-    { label: "Menu Diario", href: "#comidas" },
-    { label: "Suplementos", href: "#suplementos" },
+    { label: "1000Prep", href: "/1000prep" },
+    { label: "Suplementos", href: "/suplementos" },
     { label: "Nutricionista", href: "#nutricionista" },
-    { label: "Planes", href: "#" },
+    { label: "Planes", href: "/planes" },
   ],
   empresa: [
     { label: "Sobre Nosotros", href: "#" },

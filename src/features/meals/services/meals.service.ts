@@ -1,6 +1,7 @@
 import { fetchAPI } from "@/config/api"
 import type { Meal } from "@/features/meals/types/meal"
-import { DailyMenu, DailyMenuItem, MealIngredient } from "@/features/meals/types/daily-menu"
+import { DailyMenu, DailyMenuItem } from "@/features/meals/types/daily-menu"
+import { MealIngredient, MealAllergen } from "@/features/meals/types/meal"
 
 class MealsService {
   // Helper para convertir string a número
@@ -78,6 +79,7 @@ class MealsService {
             name: item.meal.name,
             description: item.meal.description || "",
             mealType: item.meal.mealType,
+            fitnessGoal: item.meal.fitnessGoal,
             isAvailable: item.meal.isAvailable,
             isActive: item.meal.isActive,
             price:
@@ -88,13 +90,13 @@ class MealsService {
               typeof item.meal.price === "string"
                 ? Math.round(parseFloat(item.meal.price) * 0.9)
                 : Math.round(item.meal.price * 0.9),
-            image: normalizedImage, // ✅ Usa Cloudinary o null
+            image: normalizedImage, // Usa Cloudinary o null
             protein: this.parseNumeric(item.meal.nutrition?.protein),
             carbs: this.parseNumeric(item.meal.nutrition?.carbs),
             fat: this.parseNumeric(item.meal.nutrition?.fat),
             calories: this.parseNumeric(item.meal.nutrition?.calories),
-            ingredients: (item.meal.ingredients as any[]) ?? [],
-            allergens: (item.meal.allergens as any[]) ?? [],
+            ingredients: this.extractIngredientNames(item.meal.ingredients), // Extrae nombres de ingredientes
+            allergens: this.extractAllergenNames(item.meal.allergens), // Extrae nombres de alérgenos
             tags: [],
           }
         })
