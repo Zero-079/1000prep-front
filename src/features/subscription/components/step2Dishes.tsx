@@ -23,12 +23,7 @@ export function Step2Dishes({ fitnessGoal, onBack, onContinue }: Step2DishesProp
   const maxTotal = 7
 
   // Decide which batches to display
-  const filteredByGoal: MealBatch[] = fitnessGoal
-    ? batches.filter((b) => b.meal.fitnessGoal === fitnessGoal)
-    : batches
-
-  const isFallback = filteredByGoal.length < 3
-  const displayedBatches: MealBatch[] = isFallback ? batches : filteredByGoal
+  const displayedBatches: MealBatch[] = batches
 
   // Initialise quantities whenever the displayed list changes
   useEffect(() => {
@@ -93,13 +88,6 @@ export function Step2Dishes({ fitnessGoal, onBack, onContinue }: Step2DishesProp
         </p>
       </div>
 
-      {/* Fallback notice */}
-      {isFallback && displayedBatches.length > 0 && (
-        <div className="bg-muted border border-border rounded-lg px-4 py-3 text-center text-sm text-muted-foreground">
-          Showing all available dishes for your week
-        </div>
-      )}
-
       {/* Empty state */}
       {displayedBatches.length === 0 && (
         <div className="text-center py-16 text-muted-foreground">
@@ -125,7 +113,7 @@ export function Step2Dishes({ fitnessGoal, onBack, onContinue }: Step2DishesProp
                     ;(e.target as HTMLImageElement).src = "/placeholder-dish.jpg"
                   }}
                 />
-                {index === 0 && (
+                {fitnessGoal && batch.meal.fitnessGoal === fitnessGoal && (
                   <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
                     Recomendado
                   </div>

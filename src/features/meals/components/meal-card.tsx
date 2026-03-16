@@ -156,7 +156,7 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
         {/* Price + CTA */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground line-through">{formattedPrice}</span>
+            {/* <span className="text-sm text-muted-foreground line-through">{formattedPrice}</span> */}
             <span className="text-lg font-bold text-primary leading-none">{formattedSubPrice}</span>
           </div>
           <Button

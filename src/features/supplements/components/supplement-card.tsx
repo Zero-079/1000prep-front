@@ -13,28 +13,41 @@ interface SupplementCardProps {
   onOpenDetail: (supplement: Supplement) => void
 }
 
-export function SupplementCard({ supplement, onOpenDetail }: SupplementCardProps) {
-  const { addItem } = useSupplementCart()
-
-  const defaultPresentation = supplement.presentations[0]
-  const defaultFlavor = supplement.flavors[0]
-
-  const formattedPrice = new Intl.NumberFormat("es-CO", {
+function formatCOP(value: string): string {
+  const num = parseInt(value, 10)
+  if (isNaN(num)) return value
+  return new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
     minimumFractionDigits: 0,
-  }).format(defaultPresentation.price)
+  }).format(num)
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  PROTEIN: "Proteínas",
+  VITAMINS: "Vitaminas",
+  CREATINE: "Creatina",
+  PRE_WORKOUT: "Pre-entreno",
+  FAT_BURNER: "Quemadores de grasa",
+  AMINO_ACIDS: "Aminoácidos",
+}
+
+export function SupplementCard({ supplement, onOpenDetail }: SupplementCardProps) {
+  const { addItem } = useSupplementCart()
+
+  const firstImage = supplement.images?.[0]?.url ?? null
+  const categoryLabel = CATEGORY_LABELS[supplement.category] ?? supplement.category
 
   return (
     <article
       className="group bg-card rounded-2xl border border-border overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
       onClick={() => onOpenDetail(supplement)}
     >
-      {/* Imagen cuadrada con fondo blanco */}
+      {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-white">
-        {supplement.image ? (
+        {firstImage ? (
           <Image
-            src={supplement.image}
+            src={firstImage}
             alt={supplement.name}
             fill
             className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
@@ -45,62 +58,44 @@ export function SupplementCard({ supplement, onOpenDetail }: SupplementCardProps
             <span className="text-5xl">🧪</span>
           </div>
         )}
-        {/* Badge categoría */}
         <div className="absolute top-3 left-3">
           <Badge className="bg-card/90 text-foreground backdrop-blur-sm text-[11px] font-medium border-0 shadow-sm">
-            {supplement.category}
+            {categoryLabel}
           </Badge>
         </div>
       </div>
 
-      {/* Contenido */}
+      {/* Content */}
       <div className="p-4 flex flex-col gap-3">
         <div>
           <h3 className="font-semibold text-foreground text-base leading-snug">
             {supplement.name}
           </h3>
+          <p className="text-primary text-xs font-medium mt-0.5">
+            {supplement.brand.name}
+          </p>
           <p className="text-muted-foreground text-sm mt-1 leading-relaxed line-clamp-2">
             {supplement.description}
           </p>
         </div>
 
-        {/* Sabores */}
-        {supplement.flavors.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {supplement.flavors.map((flavor) => (
-              <span
-                key={flavor}
-                className="bg-muted text-muted-foreground text-[11px] px-2.5 py-1 rounded-full"
-              >
-                {flavor}
-              </span>
-            ))}
-          </div>
+        {supplement.servingSize && (
+          <span className="bg-primary/10 text-primary text-[11px] px-2.5 py-1 rounded-full font-medium w-fit">
+            {supplement.servingSize}
+          </span>
         )}
 
-        {/* Presentaciones */}
-        <div className="flex flex-wrap gap-1.5">
-          {supplement.presentations.map((p) => (
-            <span
-              key={p.size}
-              className="bg-primary/10 text-primary text-[11px] px-2.5 py-1 rounded-full font-medium"
-            >
-              {p.size}
-            </span>
-          ))}
-        </div>
-
-        {/* Precio + CTA */}
+        {/* Price + CTA */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <span className="text-lg font-bold text-primary leading-none">
-            {formattedPrice}
+            {formatCOP(supplement.price)}
           </span>
           <Button
             size="sm"
             className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 gap-1"
             onClick={(e) => {
               e.stopPropagation()
-              addItem(supplement, defaultFlavor, defaultPresentation)
+              addItem(supplement)
             }}
           >
             <Plus className="size-4" />

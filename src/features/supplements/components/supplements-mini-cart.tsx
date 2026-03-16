@@ -4,10 +4,7 @@
 import { useState, useRef, useEffect } from "react"
 import { ShoppingCart, X, Minus, Plus, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  useSupplementCart,
-  itemKey,
-} from "@/features/supplements/context/supplements-cart-context"
+import { useSupplementCart } from "@/features/supplements/context/supplements-cart-context"
 import { cn } from "@/lib/utils"
 
 export function SupplementsMiniCart() {
@@ -28,7 +25,7 @@ export function SupplementsMiniCart() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50" ref={panelRef}>
-      {/* Panel expandido */}
+      {/* Expanded panel */}
       <div
         className={cn(
           "absolute bottom-20 right-0 w-80 bg-card border border-border rounded-2xl shadow-2xl transition-all duration-300 origin-bottom-right overflow-hidden",
@@ -61,31 +58,30 @@ export function SupplementsMiniCart() {
           ) : (
             <ul className="divide-y divide-border">
               {items.map((item) => {
-                const key = itemKey(
-                  item.supplement.id,
-                  item.flavor,
-                  item.presentation.size
-                )
+                const lineTotal =
+                  parseInt(item.supplement.price, 10) * item.quantity
                 return (
-                  <li key={key} className="p-3 flex items-center gap-3">
+                  <li key={item.supplement.id} className="p-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
                         {item.supplement.name}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
-                        {item.flavor} · {item.presentation.size}
+                        {item.supplement.brand.name} · {item.supplement.servingSize}
                       </p>
                       <p className="text-xs text-primary font-semibold">
                         {new Intl.NumberFormat("es-CO", {
                           style: "currency",
                           currency: "COP",
                           minimumFractionDigits: 0,
-                        }).format(item.presentation.price * item.quantity)}
+                        }).format(lineTotal)}
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => updateQuantity(key, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.supplement.id, item.quantity - 1)
+                        }
                         className="size-6 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
                         aria-label="Disminuir"
                       >
@@ -95,7 +91,9 @@ export function SupplementsMiniCart() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(key, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.supplement.id, item.quantity + 1)
+                        }
                         className="size-6 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
                         aria-label="Aumentar"
                       >

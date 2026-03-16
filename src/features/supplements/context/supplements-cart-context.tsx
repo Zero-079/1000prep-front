@@ -8,30 +8,20 @@ import {
   useCallback,
   type ReactNode,
 } from "react"
-import type {
-  Supplement,
-  SupplementCartItem,
-  SupplementPresentation,
-} from "../types/supplement"
+import type { Supplement, SupplementCartItem } from "../types/supplement"
 
 interface SupplementCartContextType {
   items: SupplementCartItem[]
-  addItem: (
-    supplement: Supplement,
-    flavor: string,
-    presentation: SupplementPresentation,
-    quantity?: number
-  ) => void
-  removeItem: (key: string) => void
-  updateQuantity: (key: string, quantity: number) => void
+  addItem: (supplement: Supplement, quantity?: number) => void
+  removeItem: (supplementId: string) => void
+  updateQuantity: (supplementId: string, quantity: number) => void
   clearCart: () => void
   totalItems: number
   totalPrice: number
 }
 
-// Clave única por suplemento+sabor+presentación
-function itemKey(supplementId: string, flavor: string, size: string) {
-  return `${supplementId}__${flavor}__${size}`
+function itemKey(supplementId: string) {
+  return supplementId
 }
 
 const SupplementCartContext = createContext<SupplementCartContextType | null>(null)
@@ -39,56 +29,32 @@ const SupplementCartContext = createContext<SupplementCartContextType | null>(nu
 export function SupplementCartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<SupplementCartItem[]>([])
 
-  const addItem = useCallback(
-    (
-      supplement: Supplement,
-      flavor: string,
-      presentation: SupplementPresentation,
-      quantity = 1
-    ) => {
-      const key = itemKey(supplement.id, flavor, presentation.size)
-      setItems((prev) => {
-        const existing = prev.find(
-          (i) =>
-            i.supplement.id === supplement.id &&
-            i.flavor === flavor &&
-            i.presentation.size === presentation.size
+  const addItem = useCallback((supplement: Supplement, quantity = 1) => {
+    setItems((prev) => {
+      const existing = prev.find((i) => i.supplement.id === supplement.id)
+      if (existing) {
+        return prev.map((i) =>
+          i.supplement.id === supplement.id
+            ? { ...i, quantity: i.quantity + quantity }
+            : i
         )
-        if (existing) {
-          return prev.map((i) =>
-            itemKey(i.supplement.id, i.flavor, i.presentation.size) === key
-              ? { ...i, quantity: i.quantity + quantity }
-              : i
-          )
-        }
-        return [...prev, { supplement, flavor, presentation, quantity }]
-      })
-    },
-    []
-  )
-
-  const removeItem = useCallback((key: string) => {
-    setItems((prev) =>
-      prev.filter(
-        (i) => itemKey(i.supplement.id, i.flavor, i.presentation.size) !== key
-      )
-    )
+      }
+      return [...prev, { supplement, quantity }]
+    })
   }, [])
 
-  const updateQuantity = useCallback((key: string, quantity: number) => {
+  const removeItem = useCallback((supplementId: string) => {
+    setItems((prev) => prev.filter((i) => i.supplement.id !== supplementId))
+  }, [])
+
+  const updateQuantity = useCallback((supplementId: string, quantity: number) => {
     if (quantity <= 0) {
-      setItems((prev) =>
-        prev.filter(
-          (i) => itemKey(i.supplement.id, i.flavor, i.presentation.size) !== key
-        )
-      )
+      setItems((prev) => prev.filter((i) => i.supplement.id !== supplementId))
       return
     }
     setItems((prev) =>
       prev.map((i) =>
-        itemKey(i.supplement.id, i.flavor, i.presentation.size) === key
-          ? { ...i, quantity }
-          : i
+        i.supplement.id === supplementId ? { ...i, quantity } : i
       )
     )
   }, [])
@@ -97,7 +63,7 @@ export function SupplementCartProvider({ children }: { children: ReactNode }) {
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
   const totalPrice = items.reduce(
-    (sum, i) => sum + i.presentation.price * i.quantity,
+    (sum, i) => sum + parseInt(i.supplement.price, 10) * i.quantity,
     0
   )
 
@@ -121,9 +87,7 @@ export function SupplementCartProvider({ children }: { children: ReactNode }) {
 export function useSupplementCart() {
   const ctx = useContext(SupplementCartContext)
   if (!ctx)
-    throw new Error(
-      "useSupplementCart must be used within SupplementCartProvider"
-    )
+    throw new Error("useSupplementCart must be used within SupplementCartProvider")
   return ctx
 }
 

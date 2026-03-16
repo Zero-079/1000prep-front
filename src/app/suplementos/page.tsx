@@ -10,10 +10,11 @@ import { SupplementsFilter } from "@/features/supplements/components/supplements
 import { SupplementDetailModal } from "@/features/supplements/components/supplement-detail-modal"
 import { SupplementsMiniCart } from "@/features/supplements/components/supplements-mini-cart"
 import { SupplementsInfoStrip } from "@/features/supplements/components/supplements-info-strip"
-import { SUPPLEMENTS_DATA } from "@/features/supplements/data/supplements-data"
+import { useSupplements } from "@/features/supplements/hooks/useSupplements"
 import type { Supplement } from "@/features/supplements/types/supplement"
 
 export default function SupplementosPage() {
+  const { supplements, isLoading, error } = useSupplements()
   const [detailSupplement, setDetailSupplement] = useState<Supplement | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
 
@@ -32,7 +33,9 @@ export default function SupplementosPage() {
         <section className="px-6 lg:px-8 py-8 pb-20">
           <div className="max-w-7xl mx-auto flex flex-col gap-8">
             <SupplementsFilter
-              supplements={SUPPLEMENTS_DATA}
+              supplements={supplements}
+              isLoading={isLoading}
+              error={error}
               onOpenDetail={openDetail}
             />
 

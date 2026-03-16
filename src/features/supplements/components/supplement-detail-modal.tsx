@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Minus, Plus, CheckCircle2 } from "lucide-react"
+import { Minus, Plus } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -14,14 +14,32 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import type { Supplement, SupplementPresentation } from "@/features/supplements/types/supplement"
+import type { Supplement } from "@/features/supplements/types/supplement"
 import { useSupplementCart } from "@/features/supplements/context/supplements-cart-context"
-import { cn } from "@/lib/utils"
 
 interface SupplementDetailModalProps {
   supplement: Supplement | null
   open: boolean
   onOpenChange: (open: boolean) => void
+}
+
+function formatCOP(value: string): string {
+  const num = parseInt(value, 10)
+  if (isNaN(num)) return value
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(num)
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  PROTEINS: "Proteínas",
+  VITAMINS: "Vitaminas",
+  CREATINE: "Creatina",
+  PRE_WORKOUT: "Pre-entreno",
+  RECOVERY: "Recuperación",
+  AMINO_ACIDS: "Aminoácidos",
 }
 
 export function SupplementDetailModal({
@@ -30,25 +48,16 @@ export function SupplementDetailModal({
   onOpenChange,
 }: SupplementDetailModalProps) {
   const [quantity, setQuantity] = useState(1)
-  const [selectedFlavor, setSelectedFlavor] = useState<string>("")
-  const [selectedPresentation, setSelectedPresentation] =
-    useState<SupplementPresentation | null>(null)
   const { addItem } = useSupplementCart()
 
-  // Inicializar selecciones cuando cambia el suplemento
   if (!supplement) return null
 
-  const activeFlavor = selectedFlavor || supplement.flavors[0]
-  const activePresentation = selectedPresentation || supplement.presentations[0]
-
-  const formattedPrice = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-  }).format(activePresentation.price)
+  const firstImage = supplement.images?.[0]?.url ?? null
+  const categoryLabel = CATEGORY_LABELS[supplement.category] ?? supplement.category
+  const nutrition = supplement.nutrition
 
   const handleAdd = () => {
-    addItem(supplement, activeFlavor, activePresentation, quantity)
+    addItem(supplement, quantity)
     setQuantity(1)
     onOpenChange(false)
   }
@@ -56,11 +65,11 @@ export function SupplementDetailModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-2xl">
-        {/* Imagen */}
+        {/* Image */}
         <div className="relative w-full aspect-square sm:aspect-video overflow-hidden rounded-t-2xl bg-white">
-          {supplement.image ? (
+          {firstImage ? (
             <Image
-              src={supplement.image}
+              src={firstImage}
               alt={supplement.name}
               fill
               className="object-contain p-8"
@@ -73,7 +82,7 @@ export function SupplementDetailModal({
           )}
           <div className="absolute top-4 left-4">
             <Badge className="bg-card/90 text-foreground backdrop-blur-sm text-xs font-medium border-0 shadow-sm">
-              {supplement.category}
+              {categoryLabel}
             </Badge>
           </div>
         </div>
@@ -81,6 +90,7 @@ export function SupplementDetailModal({
         {/* Body */}
         <div className="p-6 flex flex-col gap-5">
           <DialogHeader className="text-left gap-1">
+            <p className="text-primary text-sm font-medium">{supplement.brand.name}</p>
             <DialogTitle className="font-serif text-2xl font-bold text-foreground">
               {supplement.name}
             </DialogTitle>
@@ -89,115 +99,95 @@ export function SupplementDetailModal({
             </DialogDescription>
           </DialogHeader>
 
-          {/* Selector de sabor */}
-          <div>
-            <h4 className="font-semibold text-foreground text-sm mb-2">Sabor</h4>
-            <div className="flex flex-wrap gap-2">
-              {supplement.flavors.map((flavor) => (
-                <button
-                  key={flavor}
-                  onClick={() => setSelectedFlavor(flavor)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
-                    activeFlavor === flavor
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-muted-foreground border-border hover:bg-muted"
-                  )}
-                >
-                  {flavor}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Selector de presentación */}
-          <div>
-            <h4 className="font-semibold text-foreground text-sm mb-2">Presentación</h4>
-            <div className="flex flex-wrap gap-2">
-              {supplement.presentations.map((p) => (
-                <button
-                  key={p.size}
-                  onClick={() => setSelectedPresentation(p)}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-sm font-medium border transition-colors",
-                    activePresentation.size === p.size
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-muted-foreground border-border hover:bg-muted"
-                  )}
-                >
-                  {p.size} —{" "}
-                  {new Intl.NumberFormat("es-CO", {
-                    style: "currency",
-                    currency: "COP",
-                    minimumFractionDigits: 0,
-                  }).format(p.price)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Tabla nutricional placeholder */}
-          <div>
-            <h4 className="font-semibold text-foreground text-sm mb-3">
-              Información Nutricional
-            </h4>
-            <div className="bg-muted/50 rounded-xl overflow-hidden border border-border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted">
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Nutriente
-                    </th>
-                    <th className="text-right px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Por porción
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {[
-                    { label: "Calorías", value: "–" },
-                    { label: "Proteínas", value: "–" },
-                    { label: "Carbohidratos", value: "–" },
-                    { label: "Grasas totales", value: "–" },
-                    { label: "Sodio", value: "–" },
-                  ].map((row) => (
-                    <tr key={row.label}>
-                      <td className="px-4 py-2 text-foreground">{row.label}</td>
-                      <td className="px-4 py-2 text-right text-muted-foreground">
-                        {row.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-2">
-              * Datos nutricionales detallados disponibles próximamente
-            </p>
-          </div>
-
-          {/* Beneficios */}
-          {supplement.benefits.length > 0 && (
-            <div>
-              <h4 className="font-semibold text-foreground text-sm mb-2">
-                Beneficios clave
-              </h4>
-              <ul className="flex flex-col gap-1.5">
-                {supplement.benefits.map((b) => (
-                  <li key={b} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 className="size-4 text-primary shrink-0" />
-                    {b}
-                  </li>
-                ))}
-              </ul>
+          {/* Usage + serving */}
+          {(supplement.usageInstructions || supplement.servingSize) && (
+            <div className="flex flex-col gap-2">
+              {supplement.servingSize && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Porción
+                  </span>
+                  <span className="bg-primary/10 text-primary text-xs px-2.5 py-1 rounded-full font-medium">
+                    {supplement.servingSize}
+                  </span>
+                </div>
+              )}
+              {supplement.usageInstructions && (
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  <span className="font-semibold text-foreground">Modo de uso: </span>
+                  {supplement.usageInstructions}
+                </p>
+              )}
             </div>
           )}
 
           <Separator />
 
-          {/* Cantidad + Agregar */}
+          {/* Nutrition table */}
+          {nutrition && (
+            <div>
+              <h4 className="font-semibold text-foreground text-sm mb-1">
+                Información Nutricional
+              </h4>
+              <p className="text-[11px] text-muted-foreground mb-3">
+                Por porción ({supplement.servingSize}) · {nutrition.servingsPerContainer} porciones por envase
+              </p>
+              <div className="bg-muted/50 rounded-xl overflow-hidden border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-muted">
+                      <th className="text-left px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Nutriente
+                      </th>
+                      <th className="text-right px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Por porción
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    <tr>
+                      <td className="px-4 py-2 text-foreground">Calorías</td>
+                      <td className="px-4 py-2 text-right text-muted-foreground">
+                        {nutrition.calories} kcal
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-2 text-foreground">Proteínas</td>
+                      <td className="px-4 py-2 text-right text-muted-foreground">
+                        {nutrition.protein} g
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-2 text-foreground">Carbohidratos</td>
+                      <td className="px-4 py-2 text-right text-muted-foreground">
+                        {nutrition.carbs} g
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-2 text-foreground">Grasas totales</td>
+                      <td className="px-4 py-2 text-right text-muted-foreground">
+                        {nutrition.fat} g
+                      </td>
+                    </tr>
+                    {Object.entries(nutrition.otherNutrients).map(([key, val]) => (
+                      <tr key={key}>
+                        <td className="px-4 py-2 text-foreground capitalize">
+                          {key.replace(/_/g, " ")}
+                        </td>
+                        <td className="px-4 py-2 text-right text-muted-foreground">
+                          {val}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <Separator />
+
+          {/* Quantity + Add */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <Button
@@ -227,7 +217,7 @@ export function SupplementDetailModal({
               size="lg"
               onClick={handleAdd}
             >
-              Agregar al Carrito — {formattedPrice}
+              Agregar al Carrito — {formatCOP(supplement.price)}
             </Button>
           </div>
         </div>
