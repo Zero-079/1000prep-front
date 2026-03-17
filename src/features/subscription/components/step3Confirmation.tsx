@@ -3,10 +3,12 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2 } from "lucide-react"
-import { dishes } from "@/lib/dishes-data"
+import type { MealBatch } from "@/features/subscription/types/meal-batch"
 
-interface DishQuantity {
-  [key: string]: number
+interface DishSelection {
+  name: string
+  mealType: string
+  quantity: number
 }
 
 interface Step3ConfirmationProps {
@@ -14,12 +16,13 @@ interface Step3ConfirmationProps {
   planName: string
   billingType: "onetime" | "subscription"
   objective: string
-  dishSelections: DishQuantity
+  dishSelections: { [batchId: string]: DishSelection }
   planPrice: number
   onBack: () => void
 }
 
 const timeSlots = ["08:00-09:00", "12:00-13:00", "18:00-19:00"]
+
 const objectiveLabels: Record<string, string> = {
   MUSCLE_GAIN: "Ganar peso",
   MAINTENANCE: "Mantener peso",
@@ -39,7 +42,6 @@ export function Step3Confirmation({
   const [startDate, setStartDate] = useState("")
   const [timeSlot, setTimeSlot] = useState("")
 
-  // Get next Monday
   const getNextMonday = () => {
     const today = new Date()
     const dayOfWeek = today.getDay()
@@ -49,27 +51,22 @@ export function Step3Confirmation({
     return nextMonday.toISOString().split("T")[0]
   }
 
-  // Calculate total dishes
   const totalDishes = Object.values(dishSelections).reduce(
-    (sum, qty) => sum + qty,
+    (sum, info) => sum + info.quantity,
     0
   )
 
-  // Get selected dishes details
-  const selectedDishesDetails = dishes.filter((dish) => dishSelections[dish.id])
-
-  const billingTypeLabel = billingType === "subscription" ? "Suscripción" : "Pago único"
+  const billingTypeLabel =
+    billingType === "subscription" ? "Suscripción" : "Pago único"
 
   return (
     <div className="space-y-8">
-      {/* Success Icon */}
       <div className="flex justify-center">
         <div className="bg-primary/10 rounded-full p-6">
           <CheckCircle2 className="w-12 h-12 text-primary" />
         </div>
       </div>
 
-      {/* Title */}
       <div className="text-center">
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-2">
           ¡Todo listo!
@@ -79,24 +76,25 @@ export function Step3Confirmation({
         </p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Plan Selection */}
         <div className="bg-card border border-border rounded-2xl p-6">
           <h3 className="font-serif text-lg font-bold text-foreground mb-4">
             Plan elegido
           </h3>
+
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Plan:</span>
               <span className="font-semibold text-foreground">{planName}</span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-muted-foreground">Tipo de pago:</span>
               <span className="font-semibold text-foreground">
                 {billingTypeLabel}
               </span>
             </div>
+
             <div className="flex justify-between">
               <span className="text-muted-foreground">Objetivo:</span>
               <span className="font-semibold text-foreground">
@@ -106,21 +104,24 @@ export function Step3Confirmation({
           </div>
         </div>
 
-        {/* Dishes Summary */}
         <div className="bg-card border border-border rounded-2xl p-6">
           <h3 className="font-serif text-lg font-bold text-foreground mb-4">
             Platos seleccionados
           </h3>
+
           <div className="space-y-2 max-h-32 overflow-y-auto">
-            {selectedDishesDetails.map((dish) => (
-              <div key={dish.id} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dish.name}</span>
-                <span className="font-semibold text-foreground">
-                  {dishSelections[dish.id]}x
-                </span>
-              </div>
-            ))}
+            {Object.entries(dishSelections)
+              .filter(([_, info]) => info.quantity > 0)
+              .map(([batchId, info]) => (
+                <div key={batchId} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{info.name}</span>
+                  <span className="font-semibold text-foreground">
+                    {info.quantity}x
+                  </span>
+                </div>
+              ))}
           </div>
+
           <div className="border-t border-border mt-3 pt-3">
             <div className="flex justify-between font-semibold">
               <span>Total por semana:</span>
@@ -130,17 +131,16 @@ export function Step3Confirmation({
         </div>
       </div>
 
-      {/* Delivery & Preferences Form */}
       <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
         <h3 className="font-serif text-lg font-bold text-foreground">
           Detalles de entrega
         </h3>
 
-        {/* Address */}
         <div>
           <label className="block text-sm font-semibold text-foreground mb-2">
             Dirección de entrega
           </label>
+
           <input
             type="text"
             value={address}
@@ -150,11 +150,11 @@ export function Step3Confirmation({
           />
         </div>
 
-        {/* Start Date */}
         <div>
           <label className="block text-sm font-semibold text-foreground mb-2">
             Fecha de inicio (debe ser lunes)
           </label>
+
           <input
             type="date"
             value={startDate || getNextMonday()}
@@ -163,17 +163,18 @@ export function Step3Confirmation({
           />
         </div>
 
-        {/* Time Slot */}
         <div>
           <label className="block text-sm font-semibold text-foreground mb-2">
             Franja horaria
           </label>
+
           <select
             value={timeSlot}
             onChange={(e) => setTimeSlot(e.target.value)}
             className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">Selecciona una franja horaria</option>
+
             {timeSlots.map((slot) => (
               <option key={slot} value={slot}>
                 {slot}
@@ -183,24 +184,27 @@ export function Step3Confirmation({
         </div>
       </div>
 
-      {/* Pricing Summary */}
       <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
         <div className="flex justify-between items-end">
           <div>
-            <p className="text-muted-foreground mb-2">Precio total por ciclo</p>
+            <p className="text-muted-foreground mb-2">
+              Precio total por ciclo
+            </p>
+
             <p className="font-serif text-4xl font-bold text-foreground">
               ${planPrice.toLocaleString("es-CO")}
             </p>
           </div>
+
           <p className="text-sm text-muted-foreground">COP</p>
         </div>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="flex items-center justify-between gap-4 pt-4">
         <Button variant="outline" onClick={onBack} className="rounded-full">
           ← Atrás
         </Button>
+
         <Button
           disabled={!address || !startDate || !timeSlot}
           className="rounded-full px-8"

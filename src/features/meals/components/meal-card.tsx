@@ -71,7 +71,7 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
 
   return (
     <article
-      className="group bg-card rounded-2xl border border-border overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+      className="group bg-card rounded-2xl border border-border overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full"
       onClick={() => onOpenDetail(meal)}
     >
       {/* Image */}
@@ -99,14 +99,14 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col gap-3">
+      <div className="p-4 flex flex-col gap-3 flex-1">
         <div>
-          <h3 className="font-semibold text-foreground text-base leading-snug">{meal.name}</h3>
-          <p className="text-muted-foreground text-sm mt-1 leading-relaxed line-clamp-2">{meal.description}</p>
+          <h3 className="font-semibold text-foreground text-base leading-snug line-clamp-2 min-h-[2.75rem]">{meal.name}</h3>
+          <p className="text-muted-foreground text-sm mt-1 leading-relaxed line-clamp-2 min-h-[2.5rem]">{meal.description}</p>
         </div>
 
         {/* Ingredientes y Alérgenos */}
-        <div className="flex flex-col gap-1 mt-1">
+        <div className="flex flex-col gap-1 mt-1 min-h-[20px]">
           {normalizedIngredients.length > 0 && (
             <p className="text-[11px] text-muted-foreground line-clamp-1">
               <span className="font-semibold text-foreground">Ingredientes:</span>{" "}
@@ -154,7 +154,7 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
         </div>
 
         {/* Price + CTA */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+        <div className="flex items-center justify-between pt-2 border-t border-border/50 mt-auto">
           <div className="flex items-center gap-2">
             {/* <span className="text-sm text-muted-foreground line-through">{formattedPrice}</span> */}
             <span className="text-lg font-bold text-primary leading-none">{formattedSubPrice}</span>

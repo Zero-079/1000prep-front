@@ -11,10 +11,16 @@ interface MealSelections {
   [batchId: string]: number
 }
 
+interface Selection {
+  name: string
+  mealType: string
+  quantity: number
+}
+
 interface Step2DishesProps {
   fitnessGoal: string | null
   onBack: () => void
-  onContinue: (selections: MealSelections) => void
+  onContinue: (selections: { [batchId: string]: Selection }) => void
 }
 
 export function Step2Dishes({ fitnessGoal, onBack, onContinue }: Step2DishesProps) {
@@ -23,7 +29,11 @@ export function Step2Dishes({ fitnessGoal, onBack, onContinue }: Step2DishesProp
   const maxTotal = 7
 
   // Decide which batches to display
-  const displayedBatches: MealBatch[] = batches
+ const displayedBatches: MealBatch[] = [...batches].sort((a, b) => {
+  const aMatch = a.meal.fitnessGoal === fitnessGoal ? 0 : 1
+  const bMatch = b.meal.fitnessGoal === fitnessGoal ? 0 : 1
+  return aMatch - bMatch
+})
 
   // Initialise quantities whenever the displayed list changes
   useEffect(() => {
@@ -182,7 +192,23 @@ export function Step2Dishes({ fitnessGoal, onBack, onContinue }: Step2DishesProp
           ← Atrás
         </Button>
         <Button
-          onClick={() => onContinue(quantities)}
+          onClick={() => {
+            const selectionsWithInfo: { [batchId: string]: Selection } = {}
+
+            displayedBatches.forEach((batch) => {
+              const qty = quantities[batch.batchId] ?? 0
+
+              if (qty > 0) {
+                selectionsWithInfo[batch.batchId] = {
+                  name: batch.meal.name,
+                  mealType: batch.meal.mealType,
+                  quantity: qty,
+                }
+              }
+            })
+
+            onContinue(selectionsWithInfo)
+          }}
           disabled={!canContinue}
           className="rounded-full px-8"
         >

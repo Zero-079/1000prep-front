@@ -66,15 +66,15 @@ export function SupplementCard({ supplement, onOpenDetail }: SupplementCardProps
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col gap-3">
+      <div className="p-4 flex flex-col gap-3 flex-1">
         <div>
-          <h3 className="font-semibold text-foreground text-base leading-snug">
+          <h3 className="font-semibold text-foreground text-base leading-snug line-clamp-2 min-h-[2.75rem]">
             {supplement.name}
           </h3>
           <p className="text-primary text-xs font-medium mt-0.5">
             {supplement.brand.name}
           </p>
-          <p className="text-muted-foreground text-sm mt-1 leading-relaxed line-clamp-2">
+          <p className="text-muted-foreground text-sm mt-1 leading-relaxed line-clamp-2 min-h-[2.5rem]">
             {supplement.description}
           </p>
         </div>
@@ -86,7 +86,7 @@ export function SupplementCard({ supplement, onOpenDetail }: SupplementCardProps
         )}
 
         {/* Price + CTA */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+        <div className="flex items-center justify-between pt-2 border-t border-border/50 mt-auto">
           <span className="text-lg font-bold text-primary leading-none">
             {formatCOP(supplement.price)}
           </span>

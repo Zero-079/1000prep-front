@@ -7,8 +7,10 @@ import { Step2Dishes } from "./step2Dishes"
 import { Step3Confirmation } from "./step3Confirmation"
 import { useAuthContext } from "@/features/auth/context/AuthContext"
 
-interface DishQuantity {
-  [key: string]: number
+interface Selection {
+  name: string
+  mealType: string
+  quantity: number
 }
 
 interface SubscriptionFlowProps {
@@ -26,7 +28,9 @@ export function SubscriptionFlow({
 }: SubscriptionFlowProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [objective, setObjective] = useState<string | null>(null)
-  const [dishSelections, setDishSelections] = useState<DishQuantity>({})
+  const [dishSelections, setDishSelections] = useState<{
+    [batchId: string]: Selection
+  }>({})
   const { isAuthenticated, isLoading: authLoading } = useAuthContext()
 
   const totalSteps = 3
@@ -37,7 +41,7 @@ export function SubscriptionFlow({
     }
   }
 
-  const handleStep2Continue = (selections: DishQuantity) => {
+  const handleStep2Continue = (selections: { [batchId: string]: Selection }) => {
     setDishSelections(selections)
     setCurrentStep(3)
   }
