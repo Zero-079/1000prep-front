@@ -5,12 +5,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '../context/AuthContext';
 import { authService, type LoginPayload, type RegisterPayload } from '../services/auth.service';
-import { ca } from 'date-fns/locale';
 
 export function useAuth() {
   const router = useRouter();
-  const {setIsAuthenticated, setUser, isAuthenticated, user} = useAuthContext();
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    setIsAuthenticated,
+    setUser,
+    isAuthenticated,
+    user,
+    isLoading: isAuthLoading,   // ← renamed: session-check loading from context
+  } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(false); // ← action loading (login/register/logout)
   const [error, setError] = useState<string | null>(null);
 
   const login = async (data: LoginPayload) => {
@@ -25,7 +30,7 @@ export function useAuth() {
     } catch (err: any) {
       const message = err.data?.message || err.message || 'Error al iniciar sesión';
       setError(message);
-      throw err; // Re-lanzar para que el componente también lo capture si quiere
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +41,6 @@ export function useAuth() {
     setError(null);
     try {
       await authService.register(data);
-      // No guardar token después del registro, ir a login
       router.push('/login');
     } catch (err: any) {
       const message = err.data?.message || err.message || 'Error al registrarse';
@@ -54,7 +58,7 @@ export function useAuth() {
       setIsAuthenticated(false);
       setUser(null);
       router.push('/login');
-    }catch (err: any) {
+    } catch (err: any) {
       setError(err.message || 'Error al cerrar sesión');
     } finally {
       setIsLoading(false);
@@ -65,7 +69,8 @@ export function useAuth() {
     login,
     register,
     logout,
-    isLoading,
+    isLoading,        // action loading (for form spinners)
+    isAuthLoading,    // session-check loading (for navbar/layout guards)
     error,
     isAuthenticated,
     user,

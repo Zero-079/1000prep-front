@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { is } from "date-fns/locale"
 
 
 export interface HeaderUser {
@@ -43,7 +44,7 @@ const navLinks = [
 
 export function Header(){
   const [isOpen, setIsOpen] = useState(false)
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, isAuthLoading, logout } = useAuth()
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 p-4 md:p-6">
@@ -74,7 +75,12 @@ export function Header(){
 
           {/* Desktop Right Side */}
           <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated && user ? (
+            {isAuthLoading ? (
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-20 rounded-full bg-muted animate-pulse" />
+                <div className="h-9 w-24 rounded-full bg-muted animate-pulse" />
+              </div>
+            ) : isAuthenticated && user ? (
               <AccountMenu user={{ name: user.name, email: user.email }}
               onLogout={logout} />
             ) : (
@@ -91,7 +97,7 @@ export function Header(){
 
           {/* Mobile Right Side */}
           <div className="flex md:hidden items-center gap-2">
-            {isAuthenticated && user && (
+            {!isAuthLoading && isAuthenticated && user && (
               <AccountMenu user={{ name: user.name, email: user.email }} onLogout={logout} mobile />
             )}
             <button
@@ -119,7 +125,12 @@ export function Header(){
                 </Link>
               ))}
 
-              {isAuthenticated && user ? (
+              {isAuthLoading ? (
+                <div className="flex flex-col gap-3 mt-4 opacity-0 pointer-events-none" aria-hidden>
+                  <div className="h-10 w-full rounded-full bg-muted" />
+                  <div className="h-10 w-full rounded-full bg-muted" />
+                </div>
+              ) : isAuthenticated && user ? (
                 <div className="flex flex-col gap-1 mt-4 pt-4 border-t border-border/50">
                   <div className="flex items-center gap-3 px-1 mb-3">
                     <Avatar className="size-9">
