@@ -169,7 +169,7 @@ export function SupplementDetailModal({
                         {nutrition.fat} g
                       </td>
                     </tr>
-                    {Object.entries(nutrition.otherNutrients).map(([key, val]) => (
+                    {Object.entries(nutrition.otherNutrients ?? {}).map(([key, val]) => (
                       <tr key={key}>
                         <td className="px-4 py-2 text-foreground capitalize">
                           {key.replace(/_/g, " ")}

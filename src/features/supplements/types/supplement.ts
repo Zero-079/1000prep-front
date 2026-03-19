@@ -25,7 +25,7 @@ export interface SupplementNutrition {
   protein: string
   carbs: string
   fat: string
-  otherNutrients: Record<string, number>
+  otherNutrients: Record<string, number> | null
 }
 
 export interface SupplementImage {
