@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -24,20 +25,26 @@ import {
   CheckCircle2,
   XCircle,
   RotateCcw,
+  LogIn,
+  ShoppingCart,
 } from "lucide-react"
 import { useSupplementCart } from "@/features/supplements/context/supplements-cart-context"
 import { useUserAddresses } from "@/features/supplements/hooks/useUserAddresses"
 import { supplementOrderService } from "@/features/supplements/services/supplement-order.service"
 import { paymentService } from "@/features/supplements/services/payment.service"
+import { useAuthContext } from "@/features/auth/context/AuthContext"
 import { fetchAPI } from "@/config/api"
 import { cn } from "@/lib/utils"
+
+// ── Cart persistence key ────────────────────────────────────────────────────
+const CART_STORAGE_KEY = "supplement_cart_pending"
 
 interface SupplementCheckoutModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-type Step = "form" | "payment" | "success" | "cancelled"
+type Step = "login-required" | "form" | "payment" | "success" | "cancelled"
 
 function formatCOP(value: number): string {
   return new Intl.NumberFormat("es-CO", {
@@ -77,18 +84,23 @@ export function SupplementCheckoutModal({
   open,
   onOpenChange,
 }: SupplementCheckoutModalProps) {
+  const router = useRouter()
+  const { isAuthenticated, isLoading: authLoading } = useAuthContext()
   const { items, totalPrice, clearCart } = useSupplementCart()
   const { addresses, isLoading: loadingAddresses, error: addressError } =
     useUserAddresses()
 
+  // Form
   const [selectedAddressId, setSelectedAddressId] = useState("")
   const [deliveryDate, setDeliveryDate] = useState("")
   const [notes, setNotes] = useState("")
 
+  // Flow
   const [step, setStep] = useState<Step>("form")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
+  // Order / payment
   const [orderId, setOrderId] = useState<string | null>(null)
   const [orderTotal, setOrderTotal] = useState(0)
   const [expiresAt, setExpiresAt] = useState<string | null>(null)
@@ -100,6 +112,19 @@ export function SupplementCheckoutModal({
   const { minutes, seconds, secondsLeft, isExpired } = useCountdown(expiresAt)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  // ── Determine initial step based on auth ──────────────────────────────────
+  useEffect(() => {
+    if (!open) return
+    if (authLoading) return
+
+    if (!isAuthenticated) {
+      setStep("login-required")
+    } else {
+      setStep("form")
+    }
+  }, [open, isAuthenticated, authLoading])
+
+  // ── Auto-select default address ───────────────────────────────────────────
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddressId) {
       const def = addresses.find((a) => a.isDefault) ?? addresses[0]
@@ -107,6 +132,7 @@ export function SupplementCheckoutModal({
     }
   }, [addresses, selectedAddressId])
 
+  // ── Polling ───────────────────────────────────────────────────────────────
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
       clearInterval(pollingRef.current)
@@ -114,7 +140,6 @@ export function SupplementCheckoutModal({
     }
   }, [])
 
-  // Polling — detects COMPLETED and CANCELLED
   useEffect(() => {
     if (!paymentLink || !orderId || step !== "payment") return
 
@@ -125,12 +150,11 @@ export function SupplementCheckoutModal({
           payment: { status: string; paidAt: string | null } | null
         }>(`/orders/${orderId}`)
 
-        if (order.status === "COMPLETED" || order.status === "PAID") {
+        if (order.status === "CONFIRMED") {
           stopPolling()
           setStep("success")
         } else if (order.status === "CANCELLED" || order.status === "EXPIRED") {
           stopPolling()
-          // Check if payment was ever attempted
           setPaymentWasAttempted(
             order.payment != null && order.payment.status !== "COMPLETED"
           )
@@ -147,6 +171,23 @@ export function SupplementCheckoutModal({
   useEffect(() => {
     if (isExpired) stopPolling()
   }, [isExpired, stopPolling])
+
+  // ── Save cart to sessionStorage before redirecting to login ──────────────
+  const handleGoToLogin = useCallback(() => {
+    try {
+      const cartSnapshot = items.map((i) => ({
+        id: i.supplement.id,
+        quantity: i.quantity,
+      }))
+      sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartSnapshot))
+    } catch {
+      // sessionStorage might not be available
+    }
+
+    onOpenChange(false)
+    // Redirect to login with return URL
+    router.push("/login?returnTo=/suplementos")
+  }, [items, onOpenChange, router])
 
   const canSubmit =
     items.length > 0 && selectedAddressId !== "" && deliveryDate !== "" && !isSubmitting
@@ -211,6 +252,80 @@ export function SupplementCheckoutModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-0 gap-0">
 
+        {/* ══ AUTH LOADING ══ */}
+        {authLoading && (
+          <div className="flex items-center justify-center p-16">
+            <Loader2 className="size-8 text-primary animate-spin" />
+          </div>
+        )}
+
+        {/* ══ LOGIN REQUIRED ══ */}
+        {step === "login-required" && !authLoading && (
+          <div className="flex flex-col items-center justify-center gap-6 p-10 text-center">
+            {/* Cart preview */}
+            <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <ShoppingCart className="size-10 text-primary" />
+            </div>
+
+            <div>
+              <h2 className="font-serif text-2xl font-bold text-foreground mb-2">
+                Inicia sesión para continuar
+              </h2>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
+                Necesitas una cuenta para finalizar tu pedido. Tu carrito se guardará y podrás
+                continuar justo donde lo dejaste.
+              </p>
+            </div>
+
+            {/* Cart summary */}
+            {items.length > 0 && (
+              <div className="w-full bg-muted/50 rounded-xl p-4 flex flex-col gap-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                  Tu carrito
+                </p>
+                {items.slice(0, 3).map((item) => (
+                  <div key={item.supplement.id} className="flex items-center justify-between text-sm">
+                    <span className="text-foreground truncate max-w-[65%]">
+                      {item.supplement.name}
+                      <span className="text-muted-foreground ml-1">×{item.quantity}</span>
+                    </span>
+                    <span className="font-medium tabular-nums text-foreground">
+                      {formatCOP(parseInt(item.supplement.price, 10) * item.quantity)}
+                    </span>
+                  </div>
+                ))}
+                {items.length > 3 && (
+                  <p className="text-xs text-muted-foreground">
+                    +{items.length - 3} producto{items.length - 3 !== 1 ? "s" : ""} más…
+                  </p>
+                )}
+                <Separator />
+                <div className="flex items-center justify-between font-semibold text-sm">
+                  <span>Total</span>
+                  <span className="text-primary">{formatCOP(totalPrice)}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2 w-full">
+              <Button
+                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 w-full"
+                onClick={handleGoToLogin}
+              >
+                <LogIn className="size-4 mr-2" />
+                Iniciar sesión
+              </Button>
+              <Button
+                variant="ghost"
+                className="rounded-full w-full text-muted-foreground"
+                onClick={handleClose}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* ══ SUCCESS ══ */}
         {step === "success" && (
           <div className="flex flex-col items-center justify-center gap-6 p-10 text-center">
@@ -255,7 +370,6 @@ export function SupplementCheckoutModal({
               </p>
             </div>
 
-            {/* Refund notice */}
             {paymentWasAttempted && (
               <div className="w-full bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-2xl px-5 py-4 text-left flex gap-3">
                 <CreditCard className="size-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
@@ -264,8 +378,7 @@ export function SupplementCheckoutModal({
                     Reembolso automático
                   </p>
                   <p className="text-sm text-blue-700 dark:text-blue-400 leading-relaxed">
-                    Si realizaste algún pago, será devuelto automáticamente a tu
-                    método de pago en un plazo de{" "}
+                    Si realizaste algún pago, será devuelto automáticamente en un plazo de{" "}
                     <span className="font-semibold">3 a 5 días hábiles</span>.
                   </p>
                 </div>
@@ -461,20 +574,16 @@ export function SupplementCheckoutModal({
             </DialogHeader>
 
             <div className="flex flex-col gap-5 p-6">
-              {/* Total */}
               <div className="bg-muted/50 rounded-xl p-4 flex items-center justify-between">
                 <span className="text-sm font-semibold text-foreground">Total a pagar</span>
                 <span className="text-xl font-bold text-primary">{formatCOP(orderTotal || totalPrice)}</span>
               </div>
 
-              {/* Countdown */}
               {expiresAt && (
                 <div className={cn(
                   "flex items-center gap-4 rounded-xl border px-4 py-3 transition-colors",
-                  isExpired
-                    ? "border-destructive/40 bg-destructive/10"
-                    : secondsLeft <= 120
-                    ? "border-orange-400/40 bg-orange-50 dark:bg-orange-950/20"
+                  isExpired ? "border-destructive/40 bg-destructive/10"
+                    : secondsLeft <= 120 ? "border-orange-400/40 bg-orange-50 dark:bg-orange-950/20"
                     : "border-border bg-muted/40"
                 )}>
                   <Clock className={cn(
@@ -499,7 +608,6 @@ export function SupplementCheckoutModal({
                 </div>
               )}
 
-              {/* Polling indicator */}
               {paymentLink && !isExpired && (
                 <div className="flex items-center gap-2 text-muted-foreground text-xs bg-muted/50 rounded-xl px-4 py-2">
                   <Loader2 className="size-3 animate-spin shrink-0" />
@@ -507,7 +615,6 @@ export function SupplementCheckoutModal({
                 </div>
               )}
 
-              {/* Payment link / button */}
               {paymentLink ? (
                 <a
                   href={paymentLink}
@@ -545,12 +652,7 @@ export function SupplementCheckoutModal({
                 </>
               )}
 
-              <Button
-                variant="ghost"
-                className="rounded-full w-full text-muted-foreground"
-                onClick={handleClose}
-                disabled={isInitingPayment}
-              >
+              <Button variant="ghost" className="rounded-full w-full text-muted-foreground" onClick={handleClose} disabled={isInitingPayment}>
                 Cerrar
               </Button>
             </div>

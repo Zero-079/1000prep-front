@@ -11,12 +11,17 @@ import { SupplementDetailModal } from "@/features/supplements/components/supplem
 import { SupplementsMiniCart } from "@/features/supplements/components/supplements-mini-cart"
 import { SupplementsInfoStrip } from "@/features/supplements/components/supplements-info-strip"
 import { useSupplements } from "@/features/supplements/hooks/useSupplements"
+import { useRestorePendingCart } from "@/features/supplements/hooks/useRestorePendingCart"
 import type { Supplement } from "@/features/supplements/types/supplement"
 
-export default function SupplementosPage() {
+// Inner component — must be inside SupplementCartProvider to access cart context
+function SupplementsContent() {
   const { supplements, isLoading, error } = useSupplements()
   const [detailSupplement, setDetailSupplement] = useState<Supplement | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+
+  // Restore cart saved before login redirect
+  useRestorePendingCart()
 
   const openDetail = (supplement: Supplement) => {
     setDetailSupplement(supplement)
@@ -24,34 +29,39 @@ export default function SupplementosPage() {
   }
 
   return (
+    <div className="min-h-screen bg-muted/40">
+      <Header />
+
+      <SupplementsHero />
+
+      <section className="px-6 lg:px-8 py-8 pb-20">
+        <div className="max-w-7xl mx-auto flex flex-col gap-8">
+          <SupplementsFilter
+            supplements={supplements}
+            isLoading={isLoading}
+            error={error}
+            onOpenDetail={openDetail}
+          />
+          <SupplementsInfoStrip />
+        </div>
+      </section>
+
+      <SupplementDetailModal
+        supplement={detailSupplement}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
+
+      <SupplementsMiniCart />
+      <Footer />
+    </div>
+  )
+}
+
+export default function SupplementosPage() {
+  return (
     <SupplementCartProvider>
-      <div className="min-h-screen bg-muted/40">
-        <Header />
-
-        <SupplementsHero />
-
-        <section className="px-6 lg:px-8 py-8 pb-20">
-          <div className="max-w-7xl mx-auto flex flex-col gap-8">
-            <SupplementsFilter
-              supplements={supplements}
-              isLoading={isLoading}
-              error={error}
-              onOpenDetail={openDetail}
-            />
-
-            <SupplementsInfoStrip />
-          </div>
-        </section>
-
-        <SupplementDetailModal
-          supplement={detailSupplement}
-          open={detailOpen}
-          onOpenChange={setDetailOpen}
-        />
-
-        <SupplementsMiniCart />
-        <Footer />
-      </div>
+      <SupplementsContent />
     </SupplementCartProvider>
   )
 }
