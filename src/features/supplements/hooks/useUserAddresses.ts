@@ -3,15 +3,15 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { fetchAPI } from "@/config/api"
+import { useAuthContext } from "@/features/auth/context/AuthContext"
 
 export interface UserAddress {
   id: string
   label: string
   street: string
+  neighborhood: string
   city: string
-  state: string
-  zipCode?: string
-  country: string
+  references: string
   isDefault: boolean
 }
 
@@ -23,11 +23,19 @@ interface UseUserAddressesReturn {
 }
 
 export function useUserAddresses(): UseUserAddressesReturn {
+  const { isAuthenticated, isLoading: authLoading } = useAuthContext()
   const [addresses, setAddresses] = useState<UserAddress[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchAddresses = useCallback(async () => {
+    // Don't fetch if not authenticated
+    if (!isAuthenticated) {
+      setAddresses([])
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     setError(null)
     try {
@@ -43,11 +51,13 @@ export function useUserAddresses(): UseUserAddressesReturn {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [isAuthenticated])
 
   useEffect(() => {
+    // Wait for auth to resolve before deciding
+    if (authLoading) return
     fetchAddresses()
-  }, [fetchAddresses])
+  }, [fetchAddresses, authLoading])
 
   return { addresses, isLoading, error, refetch: fetchAddresses }
 }
