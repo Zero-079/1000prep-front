@@ -2,9 +2,10 @@
 import { fetchAPI } from '../../..//config/api';
 
 export interface RegisterPayload {
-  email: string;
   name: string;
+  email: string;
   phone: string;
+  address: string;
   password: string;
 }
 

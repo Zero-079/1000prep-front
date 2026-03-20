@@ -14,7 +14,8 @@ export default function RegisterPage() {
       await register({
         email: data.email,
         password: data.password,
-        name: 'aaa', // El formulario actual NO tiene nombre, necesitarás agregarlo
+        name: data.name,
+        address: data.address,
         phone: '111', // El formulario actual NO tiene teléfono, necesitarás agregarlo
       })
     } catch (err) {

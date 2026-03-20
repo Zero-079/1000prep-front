@@ -2,13 +2,15 @@
 
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
-import { Eye, EyeOff, Mail, Lock } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export interface RegisterData {
+  name: string
   email: string
+  address: string
   password: string
   confirmPassword: string
 }
@@ -18,7 +20,9 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onRegister }: RegisterFormProps) {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [address, setAddress] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -28,10 +32,20 @@ export function RegisterForm({ onRegister }: RegisterFormProps) {
 
   function validate(): boolean {
     const next: typeof errors = {}
+    if (!name) {
+      next.name = "El nombre es obligatorio"
+    } else if (name.length < 2) {
+      next.name = "Minimo 2 caracteres"
+    }
     if (!email) {
       next.email = "El correo es obligatorio"
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       next.email = "Ingresa un correo valido"
+    }
+    if (!address) {
+      next.address = "La direccion es obligatoria"
+    } else if (address.length < 5) {
+      next.address = "Minimo 5 caracteres"
     }
     if (!password) {
       next.password = "La contrasena es obligatoria"
@@ -52,7 +66,7 @@ export function RegisterForm({ onRegister }: RegisterFormProps) {
     if (!validate()) return
     setIsSubmitting(true)
     try {
-      await onRegister({ email, password, confirmPassword })
+      await onRegister({name, email, address, password, confirmPassword })
     } finally {
       setIsSubmitting(false)
     }
@@ -60,6 +74,25 @@ export function RegisterForm({ onRegister }: RegisterFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
+      {/* Name */}
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="register-name">Nombre completo</Label>
+        <div className="relative">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            id="register-name"
+            type="text"
+            placeholder="Tu nombre completo"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="pl-10 h-11 rounded-lg"
+            aria-invalid={!!errors.name}
+          />
+        </div>
+        {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+      </div>
+
       {/* Email */}
       <div className="flex flex-col gap-2">
         <Label htmlFor="register-email">Correo electronico</Label>
@@ -77,6 +110,26 @@ export function RegisterForm({ onRegister }: RegisterFormProps) {
         </div>
         {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
       </div>
+
+      {/* Dirección */}
+      
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="register-address">Dirección</Label>
+        <div className="relative">
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            id="register-address"
+            type="text"
+            placeholder="Tu dirección completa"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="pl-10 h-11 rounded-lg"
+            aria-invalid={!!errors.address}
+          />
+        </div>
+        {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
+      </div>
+      
 
       {/* Password */}
       <div className="flex flex-col gap-2">
