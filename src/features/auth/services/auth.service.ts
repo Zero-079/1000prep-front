@@ -1,10 +1,19 @@
 // src/features/auth/services/auth.service.ts
 import { fetchAPI } from '../../..//config/api';
 
+export interface AddressPayload {
+  label: string;
+  street: string;
+  neighborhood: string;
+  city: string;
+  references?: string; // optional — backend accepts it as optional
+}
+
 export interface RegisterPayload {
-  email: string;
   name: string;
+  email: string;
   phone: string;
+  address: AddressPayload;
   password: string;
 }
 

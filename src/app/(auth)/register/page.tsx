@@ -8,14 +8,16 @@ export default function RegisterPage() {
   const { register, isLoading, error } = useAuth()
 
   async function handleRegister(data: RegisterData) {
+    if (!data.address) return
     // Ready to connect to your API
-      try {
+    try {
       // Mapear datos del formulario al payload del backend
       await register({
         email: data.email,
         password: data.password,
-        name: 'aaa', // El formulario actual NO tiene nombre, necesitarás agregarlo
-        phone: '111', // El formulario actual NO tiene teléfono, necesitarás agregarlo
+        name: data.name,
+        phone: data.phone,
+        address: data.address,
       })
     } catch (err) {
       console.error('Register error:', err)
