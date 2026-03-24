@@ -7,7 +7,7 @@ import { Footer } from "@/components/footer"
 
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { LoginForm } from '@/features/auth/components'
-import type { LoginData } from '@/features/auth/components'
+import type { LoginFormData } from '@/features/auth/components'
 
 export default function Home() {
   return (
@@ -25,7 +25,7 @@ export default function Home() {
 export function LoginPage() {
   const { login, isLoading, error } = useAuth()
 
-  async function handleLogin(data: LoginData) {
+  async function handleLogin(data: LoginFormData) {
     try {
       await login(data)
     } catch (err) {

@@ -1,13 +1,13 @@
 "use client"
 
 import { LoginForm } from "@/features/auth/components"
-import type { LoginData } from "@/features/auth/components"
+import type { LoginFormData } from "@/features/auth/components"
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function LoginPage() {
   const { login, isLoading, error } = useAuth()
 
-  async function handleLogin(data: LoginData) {
+  async function handleLogin(data: LoginFormData) {
     try {
       await login(data)
     } catch (err) {

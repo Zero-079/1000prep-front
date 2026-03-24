@@ -28,6 +28,12 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
 
   if (!meal) return null
 
+  const formattedPrice = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(meal.price)
+
   const formattedSubPrice = new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency: "COP",
@@ -186,7 +192,7 @@ export function MealDetailModal({ meal, open, onOpenChange }: MealDetailModalPro
               size="lg"
               onClick={handleAdd}
             >
-              Agregar al Carrito - {formattedSubPrice}
+              Agregar al Carrito - {formattedPrice}
             </Button>
           </div>
         </div>

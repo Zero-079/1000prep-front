@@ -1,29 +1,10 @@
 "use client"
 
-import { RegisterForm } from "@/features/auth/components"
-import type { RegisterData } from "@/features/auth/components"
+import { RegisterFlow } from "@/features/auth/components"
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function RegisterPage() {
-  const { register, isLoading, error } = useAuth()
-
-  async function handleRegister(data: RegisterData) {
-    if (!data.address) return
-    // Ready to connect to your API
-    try {
-      // Mapear datos del formulario al payload del backend
-      await register({
-        email: data.email,
-        password: data.password,
-        name: data.name,
-        phone: data.phone,
-        address: data.address,
-      })
-    } catch (err) {
-      console.error('Register error:', err)
-    }
-    console.log("Register:", data)
-  }
+  const { error } = useAuth()
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,7 +23,7 @@ export default function RegisterPage() {
         </div>
       )}
       
-      <RegisterForm onRegister={handleRegister}/>
+      <RegisterFlow />
     </div>
   )
 }

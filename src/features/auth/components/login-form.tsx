@@ -1,87 +1,76 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
+import { useState } from "react"
 import Link from "next/link"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-
-export interface LoginData {
-  email: string
-  password: string
-  rememberMe: boolean
-}
+import { loginSchema, type LoginFormData } from "../schemas/login.schema"
 
 interface LoginFormProps {
-  onLogin: (data: LoginData) => Promise<void> | void
+  onLogin: (data: LoginFormData) => Promise<void> | void
 }
 
 export function LoginForm({ onLogin }: LoginFormProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Partial<Record<"email" | "password", string>>>({})
 
-  function validate(): boolean {
-    const next: typeof errors = {}
-    if (!email) {
-      next.email = "El correo es obligatorio"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      next.email = "Ingresa un correo valido"
-    }
-    if (!password) {
-      next.password = "La contrasena es obligatoria"
-    }
-    setErrors(next)
-    return Object.keys(next).length === 0
-  }
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  })
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (!validate()) return
+  async function onSubmit(data: LoginFormData) {
     setIsSubmitting(true)
     try {
-      await onLogin({ email, password, rememberMe })
+      await onLogin(data)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
       {/* Email */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="login-email">Correo electronico</Label>
+        <Label htmlFor="login-email">Correo electrónico</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             id="login-email"
             type="email"
             placeholder="tu@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            {...register("email")}
             className="pl-10 h-11 rounded-lg"
             aria-invalid={!!errors.email}
           />
         </div>
-        {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+        {errors.email?.message && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       {/* Password */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="login-password">Contrasena</Label>
+        <Label htmlFor="login-password">Contraseña</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             id="login-password"
             type={showPassword ? "text" : "password"}
-            placeholder="Tu contrasena"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Tu contraseña"
+            {...register("password")}
             className="pl-10 pr-10 h-11 rounded-lg"
             aria-invalid={!!errors.password}
           />
@@ -89,28 +78,34 @@ export function LoginForm({ onLogin }: LoginFormProps) {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
         </div>
-        {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+        {errors.password?.message && <p className="text-sm text-destructive">{errors.password.message}</p>}
       </div>
 
       {/* Remember me + Forgot */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Checkbox
-            id="remember"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(checked === true)}
+          <Controller
+            name="rememberMe"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="remember"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
           />
           <Label htmlFor="remember" className="text-sm font-normal text-muted-foreground cursor-pointer">
-            Recuerdame
+            Recuérdame
           </Label>
         </div>
         <Link href="/forgot-password" className="text-sm text-primary font-medium hover:underline">
-          Olvide mi contrasena
+          Olvidé mi contraseña
         </Link>
       </div>
 
@@ -119,13 +114,13 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         disabled={isSubmitting}
         className="h-11 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 mt-1"
       >
-        {isSubmitting ? "Iniciando sesion..." : "Iniciar sesion"}
+        {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
-        {"No tienes cuenta? "}
+        {"¿No tienes cuenta? "}
         <Link href="/register" className="text-primary font-medium hover:underline">
-          Registrate
+          Regístrate
         </Link>
       </p>
     </form>

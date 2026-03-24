@@ -157,7 +157,7 @@ export function MealCard({ meal, onOpenDetail }: MealCardProps) {
         <div className="flex items-center justify-between pt-2 border-t border-border/50 mt-auto">
           <div className="flex items-center gap-2">
             {/* <span className="text-sm text-muted-foreground line-through">{formattedPrice}</span> */}
-            <span className="text-lg font-bold text-primary leading-none">{formattedSubPrice}</span>
+            <span className="text-lg font-bold text-primary leading-none">{formattedPrice}</span>
           </div>
           <Button
             size="sm"
